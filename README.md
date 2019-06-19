@@ -18,5 +18,5 @@ Versions:
 Supports:
 * fMRI
 * EEG
-* Behavioral
+* Behavioral 
 
