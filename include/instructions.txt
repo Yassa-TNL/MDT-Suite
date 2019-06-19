@@ -1,0 +1,104 @@
+<Welcome to the MDT Suite!>
+
+To begin, select from one of the three available tasks in the suite: Object (MDT-O), Spatial (MDT-S), or Temporal (MDT-T). While the tasks themselves are different, each one uses the same parameters to define how they are run. 
+
+<Parameters>
+
+(Monitor:) Specifies the size of the task as it appears on the screen. When a given task runs, the working area, i.e. the area in which images are displayed, will be a white background displayed on screen. If Fullscreen is selected, the working area will fill up the entirety of the monitor. If Windowed is selected, the working area will be a 800x600 pixel space, centered at the center of the monitor.
+
+(Task Context:) Specifies a context of the task, if desired. "Normal" implies regular operation, i.e. a subject sitting in front of a computer screen. "ECog" specifies that a subject is running the task with ECog / electrodes hooked up. In this context, a black box appears at the corner of the screen while the stimulus appear, in order to signal a timing synchronization with a photo receptor. After the stimlus appears, a prompt is then given to the subject for response/input, and then responses are gathered. "Scanner" implies the task will be run inside a scanner, and as such the size of the window must be shrunk down significantly to account for the subject's limited field of view while inside the scanner.
+
+(Subject ID:) A number, typically 3-4 digits long, uniquely identifying a particular subject/person. For instance, John Smith might have a subject ID of 024. This 024 ID should not be used for any other person, and should be used each time John Smith runs an experiment, irrespective of other parameters. 
+
+(Trial Duration:) The length of the trial period in seconds. A trial is defined as a period of time in which an image(s) is displayed on screen and user input can be captured. If the box with "Self Paced" is checked, then this parameter is effectively ignored. The trial duration must be a decimal or integer number greater than 0, or an error will pop up preventing the experiment from being run.
+
+(ISI:) The Inter-Stimulus Interval. This defines the length of time, in seconds, to wait between successive trials. During the ISI wait period, no images will be displayed on screen, and no keypresses will be recorded. The ISI must be a decimal or integer number greater than 0, or an error will pop up preveting the experiment from being run.
+
+(Trials/Condition [Object/Spatial ONLY]:) The number of trials that will be shown per type of trial condition. Since both Object and Spatial tasks have four types of trials, the number of trials shown for each of the study and test phases will be effectively four times this number. Note that this value only applies for the Object and Spatial type experiments only, and will be effectively ignored for Temporal type experiments.
+
+(Blocks to run [Temporal ONLY]:) The number of study/test blocks to run during Temporal tasks. Since each phase in Temporal tasks is comprised of 32 trials, the total number of trials will effectively be the number as set with this parameter, times 32.
+
+(Self Paced:) If unchecked, the length of the trial will be as defined as the entry for parameter "Trial Duration". If this box is checked, the length of each trial will be effectively "paced" by the subject - the trial will continue until the user gives some form of response.
+
+(Logfile Dir:) Directory location to place the logfile. If an invalid directory is used, an error will pop up preventing the experiment from being run.
+
+
+<Experiment Types>
+
+Each experiment is comprised of two phases - study and test. In the study phase, subjects are presented with a series of images and asked to decide whether they are indoor or outdoor objects. The purpose of this is to encode the images into the subject's memory; there are no right or wrong answers during the study phase.
+
+In the test phase, a different series of images is presented to the subject. Depending upon which experiment type is used, a certain type of question will be asked of the subject, which is related to the subject's memory of the images shown in the study phase. 
+
+[Object (MDT-O):] MDTO, or MDT-Object, is a task run to test a subject's memory based on object similarity. Objects are shown as images, and images are grouped into 2 categories as follows:
+
+The first is a collection of image pairs. Each pair in this collection consists of a "target" and "lure"; the lure is a similar image to the target for each pair, and the level of similarilty can differ, known as the "lure bin", rated on a scale of 1-5 (highest to lowest similarity).  
+
+The second is a collection of "singles" or unique / non-similar images. During the task these are randomly split up into "repeats" - images that are shown twice, and "foils", images that are shown only once.
+
+The task consists of a study and test phase. In the study phase, a number  of "targets" and "repeats" are shown to the subject. In the test phase, "lures", "repeats", and "foils" are shown to the subject. In the test phase, the subject must determine which of the images being shown were also previously shown in the study phase. Indeed, only the "repeats" have been actually shown twice, while the lures exist to "trick" the subject, since they are similar to the "targets" previously shown.
+
+While the experiment proceeds, all relevant information will be written to the logfile for each trial as follows:
+
+{Trial:} The number of the trial
+{Image:} The image file presented in the trial
+{ImageType:} The type of image presented in the trial:
+	1-5: Lure bin, or the similarity rating of object: 1 (highest) to 5 (lowest)
+	sR: Single Repeated (A single, shown twice throughout the task)
+	sF: Single Foil (A single, shown once in the test phase)
+{CorResp:} Keypress corresponding to the correct answer (test phase only)
+{Response:} The keypress of the subject during the trial
+{RT:} Reaction time, from the start of the trial in milliseconds
+
+When the experiment ends, additional statistical information will be written to the logfile. For each of the four trial categories (Repeat, Lure Low, Lure High, and Foil) a score will be shown for each of the three score types (number of correct responses, number of incorrect responses, and total of responses). Note that if the experiment is not self paced, "responses" are only counted if the subject presses "v" or "n" within the length of the trial duration. This implies that the number of responses for a category may be less or equal to the total number of trials presented to the subject for that category.
+
+Finally, eight ratios are written to the logfile. For each of the four categories (Repeat, Lure Low, Lure High, and Foil) two ratios are shown: (1) the number of correct responses for a category over the total number of responses for that category, and (2) the number of incorrect responses for a category over the total number of responses for that category. Unless no responses at all were given for a given category, each ratio pair for a category should add up to 1.0.
+
+
+[Spatial (MDT-S):] MDTS, or MDT-Spatial, is a task run to test a subject's memory based on object positioning. In this task, a series of images shown to the subject two times, once in a study phase, and again in a test phase. From the study to test phase, an image's location on screen can change, by varying degrees: it can either stay in the same position, move a slight amount, move a larger amount, or move the maximum distance (from corner to opposite corner of the window).
+
+During the test phase, the subject is asked to determine whether the image has moved or stayed in the same position. The general idea is that the closer the image was to its starting position, the more difficult it will be for the subject to determine if it was actually in the same position. The task  keeps track of the subject's responses, and writes their score to a logfile at the completion of the task.
+
+For each trial throughout the experiment, the following information is written to the logfile:
+
+{Image:} The filename of the image used in the trial
+{Type:} Trial type - [Small, Small, Large, Crnr]
+{Start|End:} Start and ending coordinates of image
+{Correct:} Keypress corresponding to the correct answer (test phase only)
+{Resp:} The first keypress by the subject during the trial
+{RT:} Reaction time of the subject's response to the trial
+
+When the experiment ends, additional statistical information will be written to the logfile. For each of the four trial categories (Same, Small, Large, and Corner) a score will be shown for each of the three score types (number of correct responses, number of incorrect responses, and total of responses). Note that if the experiment is not self paced, "responses" are only counted if the subject presses "v" or "n" within the length of the trial duration. This implies that the number of responses for a category may be less or equal to the total number of trials presented to the subject for that category.
+
+Finally, eight ratios are written to the logfile. For each of the four categories (Same, Small, Large, and Corner) two ratios are shown: (1) the number of correct responses for a category over the total number of responses for that category, and (2) the number of incorrect responses for a category over the total number of responses for that category. Unless no responses at all were given for a given category, each ratio pair for a category should add up to 1.0.
+
+[Temporal (MDT-T):] MDTT, or MDT-Temporal, is a task run to test a subject's memory based on sequencing, or the order in which objects appear. In this task, multiple "blocks" consisting of study and test phases are run. In each study phase, a series of 32 images are shown. In the test phase, two images are shown side by side, both of which were shown in the preceding study phase.
+
+In each test phase, the subject must determine which image (the one on the left or right) was shown first in the preceding study phase. Four "types" of trials can be shown during the test phase, each based on the relative positioning of the objects in the sequence of the preceding study phase: 
+
+-(1) Adjacent: Images displayed immediately after one another e.g. (4,5) or (9,8)
+-(2) Eight: Images displayed between 7-9 apart from eachother e.g. (12,5) or (11,20)
+-(3) Sixteen: Images displayed between 15-17 apart from eachother e.g. (5,19) or (24,8)
+-(4) PR (Primacy/Recency): First four shown vs last four shown e.g. (29,1 or (3,32)
+
+In each study phase, images are displayed on screen. During this phase, for each trial, the subject is instructed to press "v" if the image is of an indoor object, and "n" if the image is of an outdoor object. For each instance of the study phase, for each trial, the following information is written to the logfile:
+
+{Trial:} The number of the trial
+{Image:} Filename of the image used in the trial
+{Response:} The first key pressed by the subject during the trial (blank if none)
+{RT:} The response time of the first keypress by the subject (0.000 if none)
+
+In each test phase, the same set of images is displayed on screen, however 2 images are now displayed instead of one. For each trial, the subject is instructed to press "v" if the image on the left was displayed first in the previous study phase, or "n" if the image on the right was displayed first in the previous study phase. For each instance of the test phase, for each trial, the following information is written to the logfile:
+
+{Trial:} Trial number of the test
+{LagCategory:} Spacing condition type (see above conditions for respective number)
+{LeftImage:} Filename of the image shown on the left
+{RightImage:} Filename of the image shown on the right
+{LNum:} Position the left image was shown in the study phase
+{RNum:} Position the righ timage was shown in the study phase
+{CorResp:} The keypress pertaining to the correct answer for the trial
+{Resp:} The first keypress by the subject during the trial
+{RT:} Reaction time of the first keypress
+
+When the experiment ends, additional statistical information will be written to the logfile. For each of the four trial categories (Adjacent, Eight, Sixteen, and Primacy/Recency) a score will be shown for each of the three score types (number of correct responses, number of incorrect responses, and total of responses). Note that if the experiment is not self paced, "responses" are only counted if the subject presses "v" or "n" within the length of the trial duration. This implies that the number of responses for a category may be less or equal to the total number of trials presented to the subject for that category.
+
+Finally, eight ratios are written to the logfile. For each of the four categories (Adjacent, Eight, Sixteen, and Primacy/Recency) two ratios are shown: (1) the number of correct responses for a category over the total number of responses for that category, and (2) the number of incorrect responses for a category over the total number of responses for that category. Unless no responses at all were given for a given category, each ratio pair for a category should add up to 1.0.
