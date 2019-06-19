@@ -1,8 +1,23 @@
-# MDT-Suite
-Mnemonic Discrimination Task
+# About
+Mnemonic Discrimination Task written for PsychoPy
 
-Written by: Derek Delisle
+Supported PsychoPy Versions:\
+1.85.3
 
-Maintained by: John Janecek
+Written by: Derek Delisle\
+
+Maintained by: John Janecek\
 
 Contact: janecekj@uci.edu
+
+# MDT-Suite
+Versions:\
+* Object
+* Spatial
+* Temporal
+
+Supports:\
+* fMRI
+* EEG
+* Behavioral
+
