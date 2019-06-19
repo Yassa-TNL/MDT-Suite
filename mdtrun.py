@@ -1,16 +1,5 @@
 #!/usr/bin/python
 
-#######################################
-#######################################
-#script         : mdtrun.py
-#author         : Derek Delisle
-#email          : ddelisle@uci.edu
-#date           : 3/2/2016
-#status         : In development
-#usage          : python mdtrun.py
-#######################################
-#######################################
-
 #TODO   Implement ECog functionality for all 3 tasks
 #       Implement Scanner functionality for all 3 tasks    
 

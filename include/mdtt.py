@@ -1,16 +1,3 @@
-#######################################
-#######################################
-#module         : mdtt.py
-#author         : Derek Delisle
-#email          : ddelisle@uci.edu
-#date           : 3/8/2016
-#status         : In development (working)
-#usage          : task = mdtt.MDTT(...)
-#               : task.RunExp()
-#concept        : Jared Roberts
-#######################################
-#######################################
-
 """MDTT, or MDT-Temporal, is a task run to test a subject's memory based on
 sequencing, or the order in which objects appear. In this task, multiple 
 "blocks" consisting of study and test phases are run. In each study phase,

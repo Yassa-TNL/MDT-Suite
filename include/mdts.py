@@ -1,16 +1,3 @@
-#######################################
-#######################################
-#module         : mdts.py
-#author         : Derek Delisle
-#email          : ddelisle@uci.edu
-#date           : 3/2/2016
-#status         : In development (working)
-#usage          : task = mdts.MDTS(...)
-#               : task.RunExp()
-#concept        : Zach Reagh
-#######################################
-#######################################
-
 """MDTS, or MDT-Spatial, is a task run to test a subject's memory based on
 object positioning. In this task, a series of images shown to the subject
 two times, once in a study phase, and again in a test phase. From the

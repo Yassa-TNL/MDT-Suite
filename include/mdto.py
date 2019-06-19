@@ -1,20 +1,3 @@
-#######################################
-#######################################
-#module         : mdto.py
-#author         : Derek Delisle
-#email          : ddelisle@uci.edu
-#date           : 3/2/2016
-#status         : In development (working)
-#usage          : task = mdto.MDTO(...)
-#               : task.RunExp()
-#######################################
-#######################################
-# Updated: 6/17/2019
-# John Janecek
-# janecekj@uci.edu 
-# Additions:
-# Added practice trials to beginning
-#######################################
 """MDTO, or MDT-Object, is a task run to test a subject's memory based on
 object similarity. Objects are shown as images, and images are grouped into
 2 categories as follows:
