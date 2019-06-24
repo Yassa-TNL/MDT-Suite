@@ -1,16 +1,3 @@
-#######################################
-#######################################
-#module         : mdts.py
-#author         : Derek Delisle
-#email          : ddelisle@uci.edu
-#date           : 3/2/2016
-#status         : In development (working)
-#usage          : task = mdts.MDTS(...)
-#               : task.RunExp()
-#concept        : Zach Reagh
-#######################################
-#######################################
-
 """MDTS, or MDT-Spatial, is a task run to test a subject's memory based on
 object positioning. In this task, a series of images shown to the subject
 two times, once in a study phase, and again in a test phase. From the
@@ -32,12 +19,12 @@ import os,sys,math,random
 from psychopy.visual import Window, ImageStim, TextStim, Circle, ShapeStim
 from psychopy.event import clearEvents, getKeys, waitKeys
 from psychopy.core import Clock, wait
-
+import numpy as np
 
 class MDTS(object):
 
     def __init__(self, logfile, imgDir, screenType, 
-                 trialDuration, ISI, trialsPer, selfPaced):
+                 trialDuration, ISI, trialsPer, selfPaced, practiceTrials):
 
         self.logfile = logfile
         self.trialDuration = trialDuration
@@ -47,6 +34,7 @@ class MDTS(object):
         self.numTrials = (self.trialsPer * 4)  #Trials/phase = 4x trials/cond
         self.imgDir = imgDir
         self.imgIdx = 0
+        self.runPracticeTrials = practiceTrials
 
         if (screenType == 'Windowed'):
             screenSelect = False
@@ -281,6 +269,16 @@ class MDTS(object):
             return '',0
         return keypresses[0][0],keypresses[0][1]
 
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space']):
+        '''
+        Show the prompt on the screen and wait for space, or the keylist specified
+        returns the key pressed
+        '''
+        text = TextStim(self.window,prompt,color='Black')
+        text.draw(self.window)
+        self.window.flip()
+        continueKey = waitKeys(keyList=keylist)
+        return continueKey
 
     def RunPhase(self, phaseType):
         """Runs a phase (study or test) of the task, which includes randomizing a 
@@ -400,6 +398,123 @@ class MDTS(object):
 
         #Implies test phase ran through to completion
         return 1
+        
+        
+    def SegmentPracticeImages(self, images):
+        '''
+        Segment practice image list into the 4 conditions and
+        add two coordinate pairs to each image. Add a study coordinate location
+        and test coordinate location
+        
+        Return:
+            List [image, trialType, studyCoord(x,y), testCoord(x,y)]
+        '''
+        images = np.array_split(images, 4)
+        allImages = []
+        
+        for idx, imageType in enumerate([0, 1, 2, 3]):
+            for img in images[idx]:
+                xyStudy, xyTest = self.CreatePosPair(imageType)
+                allImages.append([img, imageType, xyStudy, xyTest])
+        return allImages
+        
+    def RunSinglePractice(self, practiceBlock, images):
+        '''
+        Read in the images we want, and run the practice block for this subject
+        Run encoding and test, and write to the logs 
+        
+        Return:
+           float: ratio correct
+        '''
+        ### Encoding
+        
+        # imgs = [[img, trialType, Study(x,y), Test(x,y)]]
+        imgs = self.SegmentPracticeImages(images)
+        
+        self.ShowPromptAndWaitForSpace(" Outdoor or Indoor? (space to continue)")
+        random.shuffle(imgs)
+        
+        self.logfile.write("\nBegin Practice Encoding {}\n\n".format(practiceBlock))
+        self.logfile.write("{a:<22}{b:<12}{c:<14}{d:<11}{e:<9}{f:<8}{g}\n".format(
+            a='Image',b='Type',c='Start',d='End',e='Correct',f='Resp',g='RT'))
+        
+        # Run the trial for each encoding trial
+        for i, trial in enumerate(imgs):
+            img, trialType, studyCoord, testCoord = trial
+            response, RT = self.RunTrial(img, studyCoord)
+                
+            if (response == "escape"):
+                self.logfile.write("\n\n Practice terminated early\n\n")
+                self.logfile.close()
+                sys.exit()
+            elif (response == "space"):
+                self.Pause()
+
+            trialTypeMap = {0: 'Same', 1: 'Small', 2: 'Large', 3: 'Crnr'}
+            
+            trialTypeStr = trialTypeMap[trialType]
+            correct = ""
+                
+            self.logfile.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
+                img,trialTypeStr,studyCoord,testCoord,correct,response, RT))
+        
+        ### Test
+        self.ShowPromptAndWaitForSpace(" Same or different? (space to continue)")
+        random.shuffle(imgs)
+
+        self.logfile.write("\nBegin Practice Test {}\n\n".format(practiceBlock))
+        self.logfile.write("{a:<22}{b:<12}{c:<14}{d:<11}{e:<9}{f:<8}{g}\n".format(
+            a='Image',b='Type',c='Start',d='End',e='Correct',f='Resp',g='RT'))
+        
+        # Keep track of the total number they got correct
+        totalCorrect = 0
+        for i, trial in enumerate(imgs):
+            img, trialType, studyCoord, testCoord = trial
+            response, RT = self.RunTrial(img, testCoord)
+                
+            if (response == "escape"):
+                self.logfile.write("\n\n Practice terminated early\n\n")
+                self.logfile.close()
+                sys.exit()
+            elif (response == "space"):
+                self.Pause()
+
+            trialTypeMap = {0: 'Same', 1: 'Small', 2: 'Large', 3: 'Crnr'}
+            trialTypeStr = trialTypeMap[trialType]
+            correct = 'v' if trialType == 0 else 'n' # It should only be correct if its 'Same'
+           
+            self.logfile.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
+                img,trialTypeStr,studyCoord,testCoord,correct,response, RT))
+            if correct == response:
+                totalCorrect += 1
+            
+        # Return the percentage correct
+        return totalCorrect / len(imgs)
+
+    def RunPractice(self):
+        '''
+        Runs three rounds of practice trials. 
+        If the participant gets a certain amount correct, they move on to the real test.
+        '''
+        
+        dirFiles = os.listdir(self.imgDir)
+        practiceImages = [img for img in dirFiles if "PR_" in img]
+        random.shuffle(practiceImages)
+        
+        # Split the practice images into three sets
+        practiceImages = np.array_split(practiceImages, 3)
+
+        # Run each practice session
+        for i in range(3):
+            practicePrompt = "Let's practice"
+            self.ShowPromptAndWaitForSpace(practicePrompt)
+            
+            results = self.RunSinglePractice(i+1, [img for img in practiceImages[i]])
+            
+            # If they get a certain percentage correct, then stop the practice
+            self.ShowPromptAndWaitForSpace("You got {}% correct! (space to continue)".format(int(results*100)))
+            if results > .6:
+                return
 
     def RunExp(self):
         """Run through an instance of the task, which includes the study and test
@@ -421,6 +536,14 @@ class MDTS(object):
             waitKeys(keyList=['escape'])
             self.window.close()
 
+        # Show main welcome window
+        welcomePrompt = "Thank you for participating in our study! Press space to begin"
+        self.ShowPromptAndWaitForSpace(welcomePrompt)
+        
+        # If run practice trials, then RunPractice
+        if self.runPracticeTrials:
+            self.RunPractice()
+        
         self.RunPhase(0)
         testFinished = self.RunPhase(1)
         if (testFinished):
