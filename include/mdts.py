@@ -179,7 +179,7 @@ class MDTS(object):
     
         #First put all available images into list and shuffle
         for i in os.listdir(self.imgDir):
-            if i.lower().find('.jpg') != -1:
+            if i.lower().find('.jpg') != -1 and i.lower().find('PR_') == -1:
                 imageListFull.append(i)
         random.shuffle(imageListFull)
 
