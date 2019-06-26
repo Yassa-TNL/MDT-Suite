@@ -1,20 +1,9 @@
-#######################################
-#######################################
-#module         : mdtsuite.py
-#author         : Derek Delisle
-#email          : ddelisle@uci.edu
-#date           : 3/2/2016
-#status         : In development (working)
-#usage          : suite = mdtsuite.MDTSuite(...)
-#               : suite.RunSuite()
-#######################################
-#######################################
 
-#
+
 #### IMPORTANT: check scoring parity for each task, especially MDTO. 
 #### High likelyhood correct/incorrect scoring is ascertained correctly
 #### but reported (logged) incorrectly, look into this!
-#
+
 
 
 
@@ -186,7 +175,7 @@ class MDTSuite(object):
         elif(self.expType == "Spatial"):
             expMDTS = mdts.MDTS(logfile, self.MDTS_IMG_DIR, self.screenType,
                                 self.trialDur, self.ISI, self.expLenVar, 
-                                self.selfPaced)
+                                self.selfPaced, self.practiceTrials)
             #expMDTS.ImageDiagnostic()
             (log, scores) = expMDTS.RunExp()
             
@@ -194,7 +183,7 @@ class MDTSuite(object):
         elif(self.expType == "Temporal"):
             expMDTT = mdtt.MDTT(logfile, self.MDTT_IMG_DIR, self.subID,
                 self.screenType, self.MDTT_NUM_STIM, self.expLenVar, 
-                self.trialDur, self.ISI, self.selfPaced)
+                self.trialDur, self.ISI, self.selfPaced, self.practiceTrials)
             (log, scores) = expMDTT.RunExp()
 
         
