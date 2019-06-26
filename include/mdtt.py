@@ -21,11 +21,12 @@ import os,sys,math,random
 from psychopy.visual import Window, ImageStim, TextStim
 from psychopy.event import clearEvents, getKeys, waitKeys
 from psychopy.core import Clock, wait
+import numpy as np
 
 class MDTT(object):
 
     def __init__(self, logfile, imgDir, subjectNum, screenType, numStim, 
-                 numBlocks, trialDuration, ISI, selfPaced):
+                 numBlocks, trialDuration, ISI, selfPaced, runPractice):
 
         self.logfile = logfile
         self.imgDir = imgDir
@@ -37,6 +38,7 @@ class MDTT(object):
         self.ISI = ISI
         self.numCats = 4
         self.trialsPer = int((self.numStim / self.numCats) / 2)
+        self.runPractice = runPractice
 
         #Set up window, center, left and right image sizes + positions
 
@@ -351,6 +353,143 @@ class MDTT(object):
 
         return 1
 
+    def SegmentPracticeImages(self, images):
+        '''
+        Return the indexes for the test, it will index the image list from study:
+            [[index_left_image, index_right_image, trialType]]
+        '''
+        # Since we know that the images are already randomized, we can just iterate over them
+        # In order for the code to work, we want 4 practice images per practice block
+        assert len(images) == 4
+        
+        # Trial type of 4 means long distance
+        large_dist = (0,3,4) if random.random() > .5 else (3,0,4)
+        mid_dist_1 = (0,2,2) if random.random() > .5 else (2,0,2)
+        mid_dist_2 = (1,3,2) if random.random() > .5 else (3,1,2)
+        adjacent   = (0,1,1) if random.random() > .5 else (1,0,1)
+        adjacent_2 = (1,2,1) if random.random() > .5 else (2,1,1)
+        adjacent   = adjacent if random.random() > .5 else adjacent_2
+        
+        all = [large_dist, mid_dist_1, mid_dist_2, adjacent]
+        random.shuffle(all)
+        
+        return all
+        
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space']):
+        '''
+        Show the prompt on the screen and wait for space, or the keylist specified
+        returns the key pressed
+        '''
+        text = TextStim(self.window,prompt,color='Black')
+        text.draw(self.window)
+        self.window.flip()
+        continueKey = waitKeys(keyList=keylist)
+        return continueKey
+        
+    def RunSinglePractice(self, practiceBlock, imgs):
+        '''
+        Read in the images we want, and run the practice block for this subject
+        Run encoding and test, and write to the logs 
+        
+        Return:
+           float: ratio correct
+        '''
+        random.shuffle(imgs)
+
+        ### Encoding
+        # imgs = [[img, trialType, Study(x,y), Test(x,y)]]
+        testIdxs = self.SegmentPracticeImages(imgs)
+        
+        self.ShowPromptAndWaitForSpace(" Outdoor or Indoor? (space to continue)")
+        
+        self.logfile.write("\nBegin Practice Study {}\n".format(practiceBlock))
+        self.logfile.write("{h1:<6}{h2:<23}{h3:<10}{h4}\n".format(
+            h1="Trial",h2="Image",h3="Response",h4="RT"))
+        
+        # Run the trial for each encoding trial
+        for i in range(0, len(imgs)):
+            keyPresses = self.RunTrialSingle(imgs[i])
+            if (keyPresses == []):
+                respKey = ''
+                respRT = 0
+            else:
+                respKey = keyPresses[0][0]
+                respRT = keyPresses[0][1]
+            if (respKey == "escape"):
+                self.logfile.write("\n\n\nStudy block terminated early\n\n\n")
+                break
+
+            self.logfile.write("{:^5}{:<23}{:^11}{:<1.3f}\n".format(
+                i+1,imgs[i],respKey,respRT))
+                
+                
+        ### Test
+        self.ShowPromptAndWaitForSpace(" Same or different? (space to continue)")
+        
+        self.logfile.write("\nBegin Practice Test {}\n".format(practiceBlock))
+        self.logfile.write("{a:<7}{b:<7}{c:<23}{d:<23}{e:<7}{f:<7}{g:<10}{h:<7}{i}\n".format(
+            a="Trial",b="TType",c="LeftImage",d="RightImage",e="LNum",
+            f="RNum",g="CorResp",h="Resp",i="RT"))
+        
+        # Keep track of the total number they got correct
+        totalCorrect = 0
+        for trialNum, idxes in enumerate(testIdxs):
+            leftImgIdx, rightImgIdx, trialType = idxes
+            
+            leftImg = imgs[leftImgIdx]
+            rightImg = imgs[rightImgIdx]
+            
+            keyPresses = self.RunTrialDual(leftImg, rightImg)
+            correct = 'v' if leftImgIdx < rightImgIdx else 'n'
+
+            #Get first response, or set to none if no response
+            if (keyPresses == []):
+                respKey = ''
+                respRT = 0
+            else:
+                respKey = keyPresses[0][0]
+                respRT = keyPresses[0][1]
+            #Break out of image block with escape, break out of program with f5
+            if (respKey == 'escape'):
+                self.logfile.write("\n\nTest block terminated early\n\n")
+                break   
+             
+            #Write info to logfile
+            lgspace = "{:^5}{:^9}{:<23}{:<23}{:<7}{:<10}{:<8}{:<6}{:<1.3f}\n"
+            lgform = (lgspace.format(trialNum+1,trialType,leftImg,rightImg,
+                                     leftImgIdx,rightImgIdx,correct,respKey,respRT))
+            self.logfile.write(lgform)
+            
+            if respKey == correct:
+                totalCorrect += 1
+            
+        # Return the percentage correct
+        return totalCorrect / len(imgs)
+
+    def RunPractice(self):
+        '''
+        Runs three rounds of practice trials. 
+        If the participant gets a certain amount correct, they move on to the real test.
+        '''
+        
+        dirFiles = os.listdir(self.imgDir)
+        practiceImages = [img for img in dirFiles if "PR_" in img]
+        random.shuffle(practiceImages)
+        
+        # Split the practice images into three sets
+        practiceImages = np.array_split(practiceImages, 3)
+
+        # Run each practice session
+        for i in range(3):
+            practicePrompt = "Let's practice"
+            self.ShowPromptAndWaitForSpace(practicePrompt)
+            
+            results = self.RunSinglePractice(i+1, [img for img in practiceImages[i]])
+            
+            # If they get a certain percentage correct, then stop the practice
+            self.ShowPromptAndWaitForSpace("You got {}% correct! (space to continue)".format(int(results*100)))
+            if results > .6:
+                return
 
     def RunExp(self):
         """Runs through an instance of the MDT-T experiment, which includes
@@ -368,10 +507,14 @@ class MDTT(object):
             waitKeys(keyList=['escape'])
             self.window.close()
 
+        # Run practice
+        if self.runPractice:
+            self.RunPractice()
+
         #Put image files from folder into list
         imageList = []
         for img in os.listdir(self.imgDir):
-            if ( img[-4:] == ".jpg"):
+            if ( img[-4:] == ".jpg" and "PR_" not in img): # Make sure that PR (practice image) is not included for study/tests
                 imageList.append(img)
         random.shuffle(imageList)
 
