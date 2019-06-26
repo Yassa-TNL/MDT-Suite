@@ -7,7 +7,7 @@ Supported PsychoPy Versions:<br/>
 Written by: Derek Delisle<br/>
 Maintained by: John Janecek
 
-MDT-S Concept: Zach Reagh
+MDT-S Concept: Zach Reagh<br/>
 MDT-T Concept: Jared Roberts
 
 Contact: janecekj@uci.edu
