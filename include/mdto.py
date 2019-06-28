@@ -107,7 +107,7 @@ class MDTO(object):
         dirFiles = os.listdir(self.imgDir)
         imgTypes = ['.jpg', '.jpeg', '.JPG']
         allImgs = self.GrabFileType(dirFiles, imgTypes)
-        allImgs = [img for img in allImgs if "pract" not in img]
+        allImgs = [img for img in allImgs if "PR" not in img]
         lureLowImgs = []
         lureHighImgs = []
         for img in allImgs:
