@@ -400,7 +400,7 @@ class MDTT(object):
         # imgs = [[img, trialType, Study(x,y), Test(x,y)]]
         testIdxs = self.SegmentPracticeImages(imgs)
         
-        self.ShowPromptAndWaitForSpace(" Which came first? Left or right? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Indoor or Outdoor?")
         
         self.logfile.write("\nBegin Practice Study {}\n".format(practiceBlock))
         self.logfile.write("{h1:<6}{h2:<23}{h3:<10}{h4}\n".format(
@@ -424,7 +424,7 @@ class MDTT(object):
                 
                 
         ### Test
-        self.ShowPromptAndWaitForSpace(" Same or different? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Which came first? Left or right? (space to continue)")
         
         self.logfile.write("\nBegin Practice Test {}\n".format(practiceBlock))
         self.logfile.write("{a:<7}{b:<7}{c:<23}{d:<23}{e:<7}{f:<7}{g:<10}{h:<7}{i}\n".format(
