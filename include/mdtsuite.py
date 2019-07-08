@@ -17,12 +17,15 @@ append a list of scores/ratios to the logfile before closing it
 
 import os,sys,time, random
 import mdto, mdts, mdtt
+from psychopy.visual import Window, TextStim, Circle
+from psychopy.event import clearEvents, getKeys, waitKeys
+
 
 class MDTSuite(object):
 
     def __init__(self, expType, subID, subset, trialDur, ISI, expLenVar, 
                  selfPaced, curDir, logDir, expVariant='Normal',
-                 screenType='Fullscreen', practiceTrials=True):
+                 screenType='Fullscreen', practiceTrials=True, buttonDiagnostic=True):
 
         self.expType = expType
         self.expTypeNum = 0
@@ -36,6 +39,7 @@ class MDTSuite(object):
         self.curDir = curDir
         self.logDir = logDir
         self.practiceTrials = practiceTrials
+        self.buttonDiagnostic = buttonDiagnostic
 
         randomSeed = self.PairRandom(subID, subset)
         random.seed(randomSeed)
@@ -154,6 +158,70 @@ class MDTSuite(object):
         numSum = int(subjectNum) + int(subsetNum)
         return ((numSum*(numSum+1))/2) + subsetNum
 
+    def RunButtonDiagnostic(self):
+        '''
+        Run a test to make sure that the buttons are being recorded correctly
+        Creates a temporary window and accepts keypresses
+        Shows the buttonpresses with a highlighting circle
+        '''
+        if (self.screenType == 'Windowed'):
+            screenSelect = False
+        elif (self.screenType == 'Fullscreen'):
+            screenSelect = True
+
+        window = Window(fullscr=screenSelect,units='pix', 
+                             color='White',allowGUI=False)
+                            
+        indRadius = 100
+        tHeight = 2*indRadius/5
+        posC1 = (-window.size[0]/4, 0)
+        posC2 = (window.size[0]/4, 0 )
+        #creating circle opjects
+        circ1 = Circle(window, indRadius, lineColor = 'White', lineWidth = 6, pos = posC1) #training and p1 circles
+        circ2 = Circle(window, indRadius, lineColor = 'White', lineWidth = 6, pos = posC2)     
+        #creating text objects for cicles
+        trtext1 = TextStim(window, " Button 1", color = 'White', height = tHeight, pos = posC1) #training text
+        trtext2 = TextStim(window, " Button 2", color = 'White', height = tHeight, pos = posC2)
+        
+        #List of final circle and text objects
+        trCircs = [circ1, circ2]
+        trTexts = [trtext1, trtext2]
+
+        trTxt = TextStim(window, "This is a test to ensure that the buttons are being recorded correctly.\n Press each button to make sure it is being recorded correctly.\n Press escape to move on", pos = (0,window.size[1]/4), color = "Black", height = 40, wrapWidth = 0.8*window.size[0])
+                    
+        for circ in trCircs:
+            circ.fillColor = 'Gray'
+        trTxt.draw(window)
+        for circ in trCircs:
+            circ.draw(window)
+        for text in trTexts:
+            text.draw(window)
+        window.flip()
+        
+        while 1:
+            key = waitKeys(keyList=['v','n','space','escape'])[0]
+            
+            for circ in trCircs:
+                circ.fillColor = 'Gray'
+        
+            if key =='escape':
+                #print "Press ecape one more time\n"
+                break
+            elif key == '2' or key =='v':
+                trCircs[0].fillColor = 'Green'
+            elif key == '1' or key == 'n':
+                trCircs[1].fillColor = 'Green'
+                    
+            trTxt.draw(window)
+            for circ in trCircs:
+                circ.draw(window)
+            for text in trTexts:
+                text.draw(window)
+            window.flip()
+                
+        window.flip()
+        window.close()
+
 
     def RunSuite(self):
         """Run through one of the three tasks. Each task will return a logfile,
@@ -164,6 +232,11 @@ class MDTSuite(object):
         log = -1
         scores = -1
 
+        # Run button diagnostic tool if it is checked
+        if self.buttonDiagnostic:
+            self.RunButtonDiagnostic()
+            clearEvents()
+            
         #Run Object Task
         if (self.expType == "Object"):
             expMDTO = mdto.MDTO(logfile, self.MDTO_IMG_DIR, self.screenType,

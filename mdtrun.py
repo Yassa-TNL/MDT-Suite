@@ -154,6 +154,8 @@ class MainWindow(wx.Frame):
         self.chkSelfPaced = wx.CheckBox(self.panel, wx.ID_ANY, 'Self Paced')
         self.chkPracticeTrials = wx.CheckBox(self.panel, wx.ID_ANY, 'Practice Trials')
         self.chkPracticeTrials.SetValue(True)
+        self.chkButtonDiagnostic = wx.CheckBox(self.panel, wx.ID_ANY, 'Button Diagnostic')
+        self.chkButtonDiagnostic.SetValue(True)
         self.inputISIText = wx.StaticText(self.panel, wx.ID_ANY, 'ISI')
         self.inputISIEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '0.5')
         self.trialText = wx.StaticText(self.panel, wx.ID_ANY, 'Trials/Condition')
@@ -204,6 +206,7 @@ class MainWindow(wx.Frame):
         blockSizer         = wx.BoxSizer(wx.HORIZONTAL)
         checkSizer         = wx.BoxSizer(wx.HORIZONTAL)
         practiceTrialSizer = wx.BoxSizer(wx.HORIZONTAL)
+        buttonDiagnosticSizer = wx.BoxSizer(wx.HORIZONTAL)
         logDirSizer        = wx.BoxSizer(wx.HORIZONTAL)
         runQuitSizer       = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -243,6 +246,10 @@ class MainWindow(wx.Frame):
         checkSizer.AddStretchSpacer(1)
         practiceTrialSizer.Add(self.chkPracticeTrials, 0, lft, 5)
         practiceTrialSizer.AddStretchSpacer(1)
+        buttonDiagnosticSizer.Add(self.chkButtonDiagnostic, 0, lft, 5)
+        buttonDiagnosticSizer.AddStretchSpacer(1) 
+        
+        
         logDirSizer.Add(self.btnLogOutput, 0, wx.ALL, 5)
         logDirSizer.Add(self.dispLogOutput, 1, wx.ALL | exp, 5)
         runQuitSizer.Add(self.runButton, 0, wx.ALL, 5)
@@ -258,6 +265,7 @@ class MainWindow(wx.Frame):
         mainSizer.Add(blockSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(checkSizer, 0, lft | top | bot | exp, 5)
         mainSizer.Add(practiceTrialSizer, 0, lft | top | bot | exp, 5)
+        mainSizer.Add(buttonDiagnosticSizer, 0, lft | top | bot | exp, 5)
         mainSizer.Add(logDirSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(runQuitSizer, 0, lft | bot | exp, 5)
 
@@ -417,6 +425,7 @@ class MainWindow(wx.Frame):
             expLenVar = self.trialRB.GetStringSelection()
         selfPaced = self.chkSelfPaced.IsChecked()
         practiceTrials = self.chkPracticeTrials.IsChecked()
+        buttonDiagnostic = self.chkButtonDiagnostic.IsChecked()
         logDir = self.dispLogOutput.GetLineText(0) 
         #List of error messages
         errorMsgs = ""
@@ -456,7 +465,7 @@ class MainWindow(wx.Frame):
         else:
             expMDT = mdtsuite.MDTSuite(expType, subjectID, int(subset),
                         float(trialDur), float(ISI), int(expLenVar), 
-                        selfPaced, currentDir, logDir, expVariant, screenType, practiceTrials)
+                        selfPaced, currentDir, logDir, expVariant, screenType, practiceTrials, buttonDiagnostic)
             expMDT.RunSuite()
 
 
