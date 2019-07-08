@@ -360,7 +360,10 @@ class MDTT(object):
         '''
         # Since we know that the images are already randomized, we can just iterate over them
         # In order for the code to work, we want 4 practice images per practice block
-        assert len(images) == 4
+        if len(images) == 4:
+            print "Assertion error: length of practice images is not equal to 4"
+            self.window.close()
+            sys.exit()
         
         # Trial type of 4 means long distance
         large_dist = (0,3,4) if random.random() > .5 else (3,0,4)
@@ -474,6 +477,11 @@ class MDTT(object):
         
         dirFiles = os.listdir(self.imgDir)
         practiceImages = [img for img in dirFiles if "PR_" in img]
+        if len(practiceImages) == 0:
+            print "No practice images found"
+            self.window.close()
+            sys.exit()
+            
         random.shuffle(practiceImages)
         
         # Split the practice images into three sets
