@@ -41,6 +41,7 @@ class MDTSuite(object):
         self.practiceTrials = practiceTrials
         self.buttonDiagnostic = buttonDiagnostic
 
+
         randomSeed = self.PairRandom(subID, subset)
         random.seed(randomSeed)
 
@@ -236,7 +237,13 @@ class MDTSuite(object):
         if self.buttonDiagnostic:
             self.RunButtonDiagnostic()
             clearEvents()
-            
+        
+        # Make sure there are practice images 
+        if self.practiceTrials:
+            assert len([img for img in os.listdir(self.MDTO_IMG_DIR) if "PR_" in img]) != 0
+            assert len([img for img in os.listdir(self.MDTS_IMG_DIR) if "PR_" in img]) != 0
+            assert len([img for img in os.listdir(self.MDTT_IMG_DIR) if "PR_" in img]) != 0
+           
         #Run Object Task
         if (self.expType == "Object"):
             expMDTO = mdto.MDTO(logfile, self.MDTO_IMG_DIR, self.screenType,
