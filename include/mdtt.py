@@ -26,7 +26,7 @@ import numpy as np
 class MDTT(object):
 
     def __init__(self, logfile, imgDir, subjectNum, screenType, numStim, 
-                 numBlocks, trialDuration, ISI, selfPaced, runPractice):
+                 numBlocks, trialDuration, ISI, selfPaced, runPractice, inputButtons):
 
         self.logfile = logfile
         self.imgDir = imgDir
@@ -39,6 +39,8 @@ class MDTT(object):
         self.numCats = 4
         self.trialsPer = int((self.numStim / self.numCats) / 2)
         self.runPractice = runPractice
+        self.leftButton  = inputButtons[0]
+        self.rightButton = inputButtons[1]
 
         #Set up window, center, left and right image sizes + positions
 
@@ -188,9 +190,9 @@ class MDTT(object):
         keyPresses = []
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keyPresses = getKeys(keyList=["v","n","escape"],timeStamped=self.clock)
+            keyPresses = getKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keyPresses = waitKeys(keyList=["v","n","escape"],timeStamped=self.clock)
+            keyPresses = waitKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
         return keyPresses
@@ -213,9 +215,9 @@ class MDTT(object):
         self.clock.reset()
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keyPresses = getKeys(keyList=["v","n","escape"],timeStamped=self.clock)
+            keyPresses = getKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keyPresses = waitKeys(keyList=["v","n","escape"],timeStamped=self.clock)
+            keyPresses = waitKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
         return keyPresses
@@ -311,7 +313,7 @@ class MDTT(object):
             
             #Preserve the order images were shown in
             if (sideOrder[i] % 2 == 0):
-                correct = 'v'
+                correct = self.leftButton
                 leftIdx = firstIdx
                 rightIdx = secondIdx
                 leftImg = firstImg
@@ -319,7 +321,7 @@ class MDTT(object):
                 keyPresses = self.RunTrialDual(leftImg, rightImg)
             #Reverse order images were shown
             elif (sideOrder[i] % 2 == 1):
-                correct = 'n'
+                correct = self.rightButton
                 leftIdx = secondIdx
                 rightIdx = firstIdx
                 leftImg = secondImg
@@ -443,7 +445,7 @@ class MDTT(object):
             rightImg = imgs[rightImgIdx]
             
             keyPresses = self.RunTrialDual(leftImg, rightImg)
-            correct = 'v' if leftImgIdx < rightImgIdx else 'n'
+            correct = self.leftButton if leftImgIdx < rightImgIdx else self.rightButton
 
             #Get first response, or set to none if no response
             if (keyPresses == []):

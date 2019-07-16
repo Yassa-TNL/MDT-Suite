@@ -144,6 +144,8 @@ class MainWindow(wx.Frame):
         self.variantList = ['Normal','ECog']
         self.variantRB = wx.RadioBox(self.panel, choices=self.variantList,
                                     majorDimension=1, label="Task Context")
+                                    
+
         self.inputIDText = wx.StaticText(self.panel, wx.ID_ANY, 'Subject ID')
         self.inputIDEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '999' )
         self.inputSetText = wx.StaticText(self.panel, wx.ID_ANY, 
@@ -158,6 +160,8 @@ class MainWindow(wx.Frame):
         self.chkButtonDiagnostic.SetValue(True)
         self.inputISIText = wx.StaticText(self.panel, wx.ID_ANY, 'ISI')
         self.inputISIEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '0.5')
+        self.inputButtonsText = wx.StaticText(self.panel, wx.ID_ANY, 'Input Buttons (separate with comma)')
+        self.inputButtonsEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'v,n')
         self.trialText = wx.StaticText(self.panel, wx.ID_ANY, 'Trials/Condition')
         self.trialList = ['20','30','40']
         self.trialRB = wx.RadioBox(self.panel, choices=self.trialList,
@@ -197,11 +201,12 @@ class MainWindow(wx.Frame):
         #Create sizers - main sizer aligns all horizontal sizers vertically
         mainSizer          = wx.BoxSizer(wx.VERTICAL)
         expRadioSizer      = wx.BoxSizer(wx.HORIZONTAL)
-        choiceRadioSizer   = wx.BoxSizer(wx.VERTICAL)
+        choiceRadioSizer   = wx.BoxSizer(wx.HORIZONTAL)
         inputIDSizer       = wx.BoxSizer(wx.HORIZONTAL)
         inputSetSizer      = wx.BoxSizer(wx.HORIZONTAL)
         inputDurSizer      = wx.BoxSizer(wx.HORIZONTAL)
         inputISISizer      = wx.BoxSizer(wx.HORIZONTAL)
+        inputButtonsSizer      = wx.BoxSizer(wx.HORIZONTAL)
         trialSizer         = wx.BoxSizer(wx.HORIZONTAL)
         blockSizer         = wx.BoxSizer(wx.HORIZONTAL)
         checkSizer         = wx.BoxSizer(wx.HORIZONTAL)
@@ -214,9 +219,9 @@ class MainWindow(wx.Frame):
         expRadioSizer.Add(self.expRB, 0, top, 15)
         expRadioSizer.AddStretchSpacer(1)
         choiceRadioSizer.AddSpacer(10)
-        choiceRadioSizer.Add(self.screenRB, 0, lft, 15)
+        choiceRadioSizer.Add(self.screenRB, 0, top, 15)
         choiceRadioSizer.AddSpacer(10)
-        choiceRadioSizer.Add(self.variantRB, 0, lft, 15)
+        choiceRadioSizer.Add(self.variantRB, 0, top, 15)
         expRadioSizer.Add(choiceRadioSizer)
         inputIDSizer.Add(self.inputIDText, 0, lft, 5)
         inputIDSizer.AddStretchSpacer(1)
@@ -234,6 +239,12 @@ class MainWindow(wx.Frame):
         inputISISizer.AddStretchSpacer(1)
         inputISISizer.Add(self.inputISIEntry, 0, lft, 5)
         inputISISizer.AddSpacer((90,0))
+        
+        inputButtonsSizer.Add(self.inputButtonsText, 0, lft, 5)
+        inputButtonsSizer.AddStretchSpacer(1)
+        inputButtonsSizer.Add(self.inputButtonsEntry, 0, lft, 5)
+        inputButtonsSizer.AddSpacer((90,0))
+        
         trialSizer.Add(self.trialText, 0, lft, 5)
         trialSizer.AddStretchSpacer(1)
         trialSizer.Add(self.trialRB, 0, lft, 5)
@@ -261,6 +272,7 @@ class MainWindow(wx.Frame):
         mainSizer.Add(inputSetSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputDurSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputISISizer, 0, lft | bot | exp, 5)
+        mainSizer.Add(inputButtonsSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(trialSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(blockSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(checkSizer, 0, lft | top | bot | exp, 5)
@@ -419,6 +431,8 @@ class MainWindow(wx.Frame):
         subset = self.inputSetEntry.GetLineText(0)
         trialDur = self.inputDurEntry.GetLineText(0)
         ISI = self.inputISIEntry.GetLineText(0)
+        inputButtons = self.inputButtonsEntry.GetLineText(0)
+        
         if (expType == "Temporal"):
             expLenVar = self.blockRB.GetStringSelection()
         else:
@@ -436,8 +450,14 @@ class MainWindow(wx.Frame):
         ISIErrorText1 = "- ISI must be an integer or decimal number\n"
         ISIErrorText2 = "- ISI must be greater than 0\n"
         logErrorText = "- Logfile output directory does not exist\n"
+        buttonErrorText = " - Buttons must be separated by comma, with only 2 buttons\n"
     
         #Add errors to error message if they occur
+        if "," not in inputButtons or len(inputButtons.split(",")) != 2:
+            errorMsgs += buttonErrorText
+        else:
+            inputButtons = [str(inputButton.strip().lower()) for inputButton in inputButtons.split(",")]
+            
         if (subjectID.isdigit() == False):
             errorMsgs += idErrorText
         if not subset.isdigit():
@@ -465,7 +485,7 @@ class MainWindow(wx.Frame):
         else:
             expMDT = mdtsuite.MDTSuite(expType, subjectID, int(subset),
                         float(trialDur), float(ISI), int(expLenVar), 
-                        selfPaced, currentDir, logDir, expVariant, screenType, practiceTrials, buttonDiagnostic)
+                        selfPaced, currentDir, logDir, expVariant, screenType, practiceTrials, buttonDiagnostic, inputButtons)
             expMDT.RunSuite()
 
 

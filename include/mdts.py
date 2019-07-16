@@ -24,7 +24,7 @@ import numpy as np
 class MDTS(object):
 
     def __init__(self, logfile, imgDir, screenType, 
-                 trialDuration, ISI, trialsPer, selfPaced, practiceTrials):
+                 trialDuration, ISI, trialsPer, selfPaced, practiceTrials, inputButtons):
 
         self.logfile = logfile
         self.trialDuration = trialDuration
@@ -35,6 +35,9 @@ class MDTS(object):
         self.imgDir = imgDir
         self.imgIdx = 0
         self.runPracticeTrials = practiceTrials
+        self.leftButton  = inputButtons[0]
+        self.rightButton = inputButtons[1]
+
 
         if (screenType == 'Windowed'):
             screenSelect = False
@@ -260,9 +263,9 @@ class MDTS(object):
         keypresses = []
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keypresses = getKeys(keyList=["v","n","escape"],timeStamped=self.clock)
+            keypresses = getKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keypresses = waitKeys(keyList=["v","n","escape"],timeStamped=self.clock)
+            keypresses = waitKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
         if len(keypresses) <1:
@@ -339,19 +342,19 @@ class MDTS(object):
             if (trialFactor == 0):
                 trialType = "Same"
                 if (phaseType == 1):
-                    correct = "v"
+                    correct = self.leftButton
             elif (trialFactor == 1):
                 trialType = "Small"
                 if (phaseType == 1):
-                    correct = "n"
+                    correct = self.rightButton
             elif (trialFactor == 2):
                 trialType = "Large"
                 if (phaseType == 1):
-                    correct = "n"
+                    correct = self.rightButton
             elif (trialFactor == 3):
                 trialType = "Crnr"
                 if (phaseType == 1):
-                    correct = "n"    
+                    correct = self.rightButton
 
             #Display image in start position in study, end position in test
             if (phaseType == 0):
@@ -481,7 +484,7 @@ class MDTS(object):
 
             trialTypeMap = {0: 'Same', 1: 'Small', 2: 'Large', 3: 'Crnr'}
             trialTypeStr = trialTypeMap[trialType]
-            correct = 'v' if trialType == 0 else 'n' # It should only be correct if its 'Same'
+            correct = self.leftButton if trialType == 0 else self.rightButton # It should only be correct if its 'Same'
            
             self.logfile.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
                 img,trialTypeStr,studyCoord,testCoord,correct,response, RT))

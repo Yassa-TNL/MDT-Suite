@@ -34,7 +34,7 @@ import glob
 class MDTO(object):
 
     def __init__(self, logfile, imgDir, screenType, expVariant,
-                trialDuration, ISI, trialsPer, selfPaced, practiceTrials):
+                trialDuration, ISI, trialsPer, selfPaced, practiceTrials, inputButtons):
 
         self.logfile = logfile
         self.expVariant = expVariant
@@ -47,6 +47,8 @@ class MDTO(object):
         self.splitLures = self.SplitLures()
         self.splitSingles = self.SplitSingles()
         self.runPracticeTrials = practiceTrials
+        self.leftButton  = inputButtons[0]
+        self.rightButton = inputButtons[1]
 
         if (screenType == 'Windowed'):
             screenSelect = False
@@ -287,10 +289,10 @@ class MDTO(object):
         keyPresses = []
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keyPresses = getKeys(keyList=['v','n','space','escape'],
+            keyPresses = getKeys(keyList=[self.leftButton, self.rightButton,'space','escape'],
                                  timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keyPresses = waitKeys(keyList=['v','n','space','escape'],
+            keyPresses = waitKeys(keyList=[self.leftButton, self.rightButton,'space','escape'],
                                 timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
@@ -409,10 +411,10 @@ class MDTO(object):
         #Run trial for each image in list, get responses
         for i in range(0, len(testImgList)):
 
-            correct = "n" if not ecog else "2"
+            correct = self.rightButton
             trialType = testImgList[i][1]
             if (trialType == "sR"):
-                correct = "v" if not ecog else "1"
+                correct = self.leftButton
             if not ecog:
                 (response, RT) = self.RunTrial(testImgList[i][0])
             else:
@@ -531,7 +533,7 @@ class MDTO(object):
             else:
                 response, RT = self.RunTrial(imgB)
                     
-            correct = 'v' if trialType == 'sR' else 'n'
+            correct = self.leftButton if trialType == 'sR' else self.rightButton
             if response == correct:
                 totalCorrect += 1
             if (response == "escape"):

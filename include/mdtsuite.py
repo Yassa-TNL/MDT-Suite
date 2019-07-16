@@ -25,7 +25,7 @@ class MDTSuite(object):
 
     def __init__(self, expType, subID, subset, trialDur, ISI, expLenVar, 
                  selfPaced, curDir, logDir, expVariant='Normal',
-                 screenType='Fullscreen', practiceTrials=True, buttonDiagnostic=True):
+                 screenType='Fullscreen', practiceTrials=True, buttonDiagnostic=True, inputButtons=['v','n']):
 
         self.expType = expType
         self.expTypeNum = 0
@@ -40,6 +40,7 @@ class MDTSuite(object):
         self.logDir = logDir
         self.practiceTrials = practiceTrials
         self.buttonDiagnostic = buttonDiagnostic
+        self.inputButtons = inputButtons
 
 
         randomSeed = self.PairRandom(subID, subset)
@@ -100,6 +101,7 @@ class MDTSuite(object):
         lnT = "\nBlocks ran: %d" if eType == "MDTT" else "\nTrials/Condition: %d"
         log.write(lnT %(self.expLenVar))
         log.write("\nTask Variant: %s\n" %(self.expVariant))
+        log.write("Input buttons: {}\n".format(self.inputButtons))
 
         return log
 
@@ -200,7 +202,7 @@ class MDTSuite(object):
         window.flip()
         
         while 1:
-            key = waitKeys(keyList=['v','n','space','escape'])[0]
+            key = waitKeys(keyList=self.inputButtons + ['space','escape'])[0]
             
             for circ in trCircs:
                 circ.fillColor = 'Gray'
@@ -208,9 +210,9 @@ class MDTSuite(object):
             if key =='escape':
                 #print "Press ecape one more time\n"
                 break
-            elif key == '2' or key =='v':
+            elif key == self.inputButtons[0]:
                 trCircs[0].fillColor = 'Green'
-            elif key == '1' or key == 'n':
+            elif key == self.inputButtons[1]:
                 trCircs[1].fillColor = 'Green'
                     
             trTxt.draw(window)
@@ -248,14 +250,14 @@ class MDTSuite(object):
         if (self.expType == "Object"):
             expMDTO = mdto.MDTO(logfile, self.MDTO_IMG_DIR, self.screenType,
                                 self.expVariant, self.trialDur, self.ISI, 
-                                self.expLenVar, self.selfPaced, self.practiceTrials)
+                                self.expLenVar, self.selfPaced, self.practiceTrials, self.inputButtons)
             (log, scores) = expMDTO.RunExp()
 
         #Run Spatial Task   
         elif(self.expType == "Spatial"):
             expMDTS = mdts.MDTS(logfile, self.MDTS_IMG_DIR, self.screenType,
                                 self.trialDur, self.ISI, self.expLenVar, 
-                                self.selfPaced, self.practiceTrials)
+                                self.selfPaced, self.practiceTrials, self.inputButtons)
             #expMDTS.ImageDiagnostic()
             (log, scores) = expMDTS.RunExp()
             
@@ -263,7 +265,7 @@ class MDTSuite(object):
         elif(self.expType == "Temporal"):
             expMDTT = mdtt.MDTT(logfile, self.MDTT_IMG_DIR, self.subID,
                 self.screenType, self.MDTT_NUM_STIM, self.expLenVar, 
-                self.trialDur, self.ISI, self.selfPaced, self.practiceTrials)
+                self.trialDur, self.ISI, self.selfPaced, self.practiceTrials, self.inputButtons)
             (log, scores) = expMDTT.RunExp()
 
         
