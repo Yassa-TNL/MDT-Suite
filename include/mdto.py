@@ -373,7 +373,7 @@ class MDTO(object):
         """
         ecog = False if self.expVariant != "ECog" else True
         testPromptN = ("In this phase, another sequence of images will be shown"
-                      "\n\nAre the objects same or different?"
+                      "\n\nAre the objects old or new?"
                       )
         '''testPromptE = ("In this phase, another sequence of images will be shown."
                       "\n\n-Press '1' if the image presented was also shown "
@@ -524,7 +524,7 @@ class MDTO(object):
 
 
         ### Test
-        self.ShowPromptAndWaitForSpace(" Same or different? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Old or new? (space to continue)")
         random.shuffle(imgPairs)
 
         self.logfile.write("\nBegin Practice Test {}\n\n".format(practiceBlock))
