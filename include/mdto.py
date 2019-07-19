@@ -511,7 +511,7 @@ class MDTO(object):
             if trialType != 'sF':
                 response, RT = self.RunTrial(imgA)
                 
-                if (respKey == 'escape'):
+                if (response == 'escape'):
                     self.logfile.write("\n\nPractice block terminated early\n\n")
                     self.logfile.close()
                     sys.exit()
