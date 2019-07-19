@@ -161,7 +161,7 @@ class MainWindow(wx.Frame):
         self.inputISIText = wx.StaticText(self.panel, wx.ID_ANY, 'ISI')
         self.inputISIEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '0.5')
         self.inputButtonsText = wx.StaticText(self.panel, wx.ID_ANY, 'Input Buttons (separate with comma)')
-        self.inputButtonsEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'v,n')
+        self.inputButtonsEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'z,m')
         self.trialText = wx.StaticText(self.panel, wx.ID_ANY, 'Trials/Condition')
         self.trialList = ['20','30','40']
         self.trialRB = wx.RadioBox(self.panel, choices=self.trialList,
