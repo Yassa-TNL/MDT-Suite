@@ -380,7 +380,7 @@ class MDTT(object):
         
         return all
         
-    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space']):
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space', 'escape']):
         '''
         Show the prompt on the screen and wait for space, or the keylist specified
         returns the key pressed
@@ -389,6 +389,11 @@ class MDTT(object):
         text.draw(self.window)
         self.window.flip()
         continueKey = waitKeys(keyList=keylist)
+        if len(continueKey) != 0 and continueKey[0] == 'escape':
+            self.logfile.write("Terminated early.")
+            self.logfile.close()
+            sys.exit()
+        print continueKey
         return continueKey
         
     def RunSinglePractice(self, practiceBlock, imgs):
@@ -456,8 +461,9 @@ class MDTT(object):
                 respRT = keyPresses[0][1]
             #Break out of image block with escape, break out of program with f5
             if (respKey == 'escape'):
-                self.logfile.write("\n\nTest block terminated early\n\n")
-                break   
+                self.logfile.write("\n\nPractice block terminated early\n\n")
+                self.logfile.close()
+                sys.exit()
              
             #Write info to logfile
             lgspace = "{:^5}{:^9}{:<23}{:<23}{:<7}{:<10}{:<8}{:<6}{:<1.3f}\n"

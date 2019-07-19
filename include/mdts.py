@@ -272,7 +272,7 @@ class MDTS(object):
             return '',0
         return keypresses[0][0],keypresses[0][1]
 
-    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space']):
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space', 'escape']):
         '''
         Show the prompt on the screen and wait for space, or the keylist specified
         returns the key pressed
@@ -281,6 +281,11 @@ class MDTS(object):
         text.draw(self.window)
         self.window.flip()
         continueKey = waitKeys(keyList=keylist)
+        if len(continueKey) != 0 and continueKey[0] == 'escape':
+            self.logfile.write("Terminated early.")
+            self.logfile.close()
+            sys.exit()
+        print continueKey
         return continueKey
 
     def RunPhase(self, phaseType):

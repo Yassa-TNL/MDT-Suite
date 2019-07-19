@@ -459,7 +459,7 @@ class MDTO(object):
         return 1
     
 
-    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space']):
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space', 'escape']):
         '''
         Show the prompt on the screen and wait for space, or the keylist specified
         returns the key pressed
@@ -468,6 +468,11 @@ class MDTO(object):
         text.draw(self.window)
         self.window.flip()
         continueKey = waitKeys(keyList=keylist)
+        if len(continueKey) != 0 and continueKey[0] == 'escape':
+            self.logfile.write("Terminated early.")
+            self.logfile.close()
+            sys.exit()
+        print continueKey
         return continueKey
 
     def RunSinglePractice(self, practiceBlock, images):
@@ -506,9 +511,10 @@ class MDTO(object):
             if trialType != 'sF':
                 response, RT = self.RunTrial(imgA)
                 
-                if (response == "escape"):
-                    self.logfile.write("\n\n Practice terminated early\n\n")
-                    return -1
+                if (respKey == 'escape'):
+                    self.logfile.write("\n\nPractice block terminated early\n\n")
+                    self.logfile.close()
+                    sys.exit()
                 elif (response == "space"):
                     self.Pause()
 
