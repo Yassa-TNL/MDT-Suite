@@ -472,7 +472,6 @@ class MDTO(object):
             self.logfile.write("Terminated early.")
             self.logfile.close()
             sys.exit()
-        print continueKey
         return continueKey
 
     def RunSinglePractice(self, practiceBlock, images):
