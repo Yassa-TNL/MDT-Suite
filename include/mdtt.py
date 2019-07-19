@@ -362,7 +362,7 @@ class MDTT(object):
         '''
         # Since we know that the images are already randomized, we can just iterate over them
         # In order for the code to work, we want 4 practice images per practice block
-        if len(images) == 4:
+        if len(images) != 4:
             print "Assertion error: length of practice images is not equal to 4"
             self.window.close()
             sys.exit()
