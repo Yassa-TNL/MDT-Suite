@@ -230,11 +230,7 @@ class MDTT(object):
         imageBlock: List of images to display during the study
         session: the number of the session (block number) that is running
         """
-        studyPrompt = ("In the following phase, a sequence of images will be "
-                       "shown.\n\n-Press the blue button if the image is of an indoor "
-                       "object.\n\n-Press the red button if the image is of an outdoor "
-                       "object.\n\n\nPress space to begin"
-                       )
+        studyPrompt = ("Test Session {}/{}: Are the following objects indoor or outdoor?".format(session, 10))
         studyText = TextStim(self.window,studyPrompt,color='Black')
         studyText.draw(self.window)
         self.window.flip()
@@ -275,12 +271,7 @@ class MDTT(object):
         pairList: List of paired image indexes w/ trial type
         session: the number of the session (block number) that is running
         """
-        testPrompt = ("In the following phase, a sequence of image pairs will be "
-                      "shown. Each image shown in this phase was also shown in "
-                      "the previous phase. For each pair of images:\n\n-Press the blue button "
-                      "if the image on the left was shown first in the previous "
-                      "phase.\n\n-Press the red button if the image on the right was shown "
-                      "first in the previous phase.\n\n\nPress space to begin")
+        testPrompt = ("In this phase, the same series of objects will be shown\n\nWhich came first: Left or Right? ")
         testText = TextStim(self.window,testPrompt,color='Black')
         testText.draw(self.window)
         self.window.flip()
@@ -393,7 +384,6 @@ class MDTT(object):
             self.logfile.write("Terminated early.")
             self.logfile.close()
             sys.exit()
-        print continueKey
         return continueKey
         
     def RunSinglePractice(self, practiceBlock, imgs):

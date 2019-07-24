@@ -299,17 +299,8 @@ class MDTS(object):
                 1 -> task ran to completion 
         """
 
-        studyPrompt = ("In the following phase, a sequence of images will be "
-                       "shown.\n\n-Press the blue button if the image is of an indoor "
-                       "object.\n\n-Press the red button if the image is of an outdoor "
-                       "object.\n\n\nPress space to begin"
-                       )
-        testPrompt = ("In the following phase, another sequence of images will "
-                      "be shown.\n\n-Press the blue button if the image is in the same "
-                      "location as it was in the last phase.\n\nPress the red button if "
-                      "the image is in a different location than it was in the "
-                      "last phase.\n\n\nPress space to begin"
-                       )
+        studyPrompt = ("Let's do the real test. \n\n Are the following objects indoor or outdoor?")
+        testPrompt = ("In this phase, you will see the same series of objects one at a time.\n\nAre the object locations same or new?")
         studyText = TextStim(self.window,studyPrompt,color='Black')
         testText = TextStim(self.window,testPrompt,color='Black')
 
@@ -466,7 +457,7 @@ class MDTS(object):
                 img,trialTypeStr,studyCoord,testCoord,correct,response, RT))
         
         ### Test
-        self.ShowPromptAndWaitForSpace(" Same or different? (space to continue)")
+        self.ShowPromptAndWaitForSpace("Is the object location same or new? (space to continue)")
         random.shuffle(imgs)
 
         self.logfile.write("\nBegin Practice Test {}\n\n".format(practiceBlock))
