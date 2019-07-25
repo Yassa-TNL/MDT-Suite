@@ -3,6 +3,7 @@
 #TODO   Implement ECog functionality for all 3 tasks
 #       Implement Scanner functionality for all 3 tasks    
 
+VERSION=1.1
 
 """Creates the GUI for the MDT Suite. MDT, or Mnemonic Discrimination 
 Task, is a type of experimental task that tests various aspects of a
@@ -498,7 +499,7 @@ class MainWindow(wx.Frame):
                         selfPaced, currentDir, logDir, expVariant, 
                         screenType, practiceTrials, buttonDiagnostic, 
                         inputButtons, pauseButton)
-            expMDT.RunSuite()
+            expMDT.RunSuite(VERSION)
 
 
     def OnExit(self,e):

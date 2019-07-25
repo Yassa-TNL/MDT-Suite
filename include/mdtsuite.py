@@ -93,6 +93,7 @@ class MDTSuite(object):
 
         #Write experiment parameters to beginning of logfile
         log.write("MDT-%s Task: %s" %(self.expType, logTime))
+        log.write("\nVersion: {}".format(self._version))
         log.write("\nSubject ID: %d" %(sub))
         if self.selfPaced:
             log.write("\nTrial Duration: Self paced by subject")
@@ -203,12 +204,12 @@ class MDTSuite(object):
         window.flip()
         
         while 1:
-            key = waitKeys(keyList=self.inputButtons + ['space','escape'])[0]
+            key = waitKeys(keyList=self.inputButtons + [self.pauseButton,'escape'])[0]
             
             for circ in trCircs:
                 circ.fillColor = 'Gray'
         
-            if key =='escape':
+            if key =='escape' or key == self.pauseButton:
                 #print "Press ecape one more time\n"
                 break
             elif key == self.inputButtons[0]:
@@ -227,11 +228,12 @@ class MDTSuite(object):
         window.close()
 
 
-    def RunSuite(self):
+    def RunSuite(self, VERS):
         """Run through one of the three tasks. Each task will return a logfile,
         as well a scorelist. Following running a task, call the WriteScores()
         method within this class.
         """
+        self._version = VERS
         logfile = self.MakeLog()
         log = -1
         scores = -1
