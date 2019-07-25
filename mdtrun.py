@@ -162,6 +162,8 @@ class MainWindow(wx.Frame):
         self.inputISIEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '0.5')
         self.inputButtonsText = wx.StaticText(self.panel, wx.ID_ANY, 'Input Buttons (separate with comma)')
         self.inputButtonsEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'z,m')
+        self.pauseButtonText = wx.StaticText(self.panel, wx.ID_ANY, 'Pause button')
+        self.pauseButtonEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'p')
         self.trialText = wx.StaticText(self.panel, wx.ID_ANY, 'Trials/Condition')
         self.trialList = ['20','30','40']
         self.trialRB = wx.RadioBox(self.panel, choices=self.trialList,
@@ -207,6 +209,7 @@ class MainWindow(wx.Frame):
         inputDurSizer      = wx.BoxSizer(wx.HORIZONTAL)
         inputISISizer      = wx.BoxSizer(wx.HORIZONTAL)
         inputButtonsSizer      = wx.BoxSizer(wx.HORIZONTAL)
+        pauseButtonSizer      = wx.BoxSizer(wx.HORIZONTAL)
         trialSizer         = wx.BoxSizer(wx.HORIZONTAL)
         blockSizer         = wx.BoxSizer(wx.HORIZONTAL)
         checkSizer         = wx.BoxSizer(wx.HORIZONTAL)
@@ -239,7 +242,10 @@ class MainWindow(wx.Frame):
         inputISISizer.AddStretchSpacer(1)
         inputISISizer.Add(self.inputISIEntry, 0, lft, 5)
         inputISISizer.AddSpacer((90,0))
-        
+        pauseButtonSizer.Add(self.pauseButtonText, 0, lft, 5)
+        pauseButtonSizer.AddStretchSpacer(1)
+        pauseButtonSizer.Add(self.pauseButtonEntry, 0, lft, 5)
+        pauseButtonSizer.AddSpacer((90,0))
         inputButtonsSizer.Add(self.inputButtonsText, 0, lft, 5)
         inputButtonsSizer.AddStretchSpacer(1)
         inputButtonsSizer.Add(self.inputButtonsEntry, 0, lft, 5)
@@ -273,6 +279,7 @@ class MainWindow(wx.Frame):
         mainSizer.Add(inputDurSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputISISizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputButtonsSizer, 0, lft | bot | exp, 5)
+        mainSizer.Add(pauseButtonSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(trialSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(blockSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(checkSizer, 0, lft | top | bot | exp, 5)
@@ -432,6 +439,7 @@ class MainWindow(wx.Frame):
         trialDur = self.inputDurEntry.GetLineText(0)
         ISI = self.inputISIEntry.GetLineText(0)
         inputButtons = self.inputButtonsEntry.GetLineText(0)
+        pauseButton = self.pauseButtonEntry.GetLineText(0)
         
         if (expType == "Temporal"):
             expLenVar = self.blockRB.GetStringSelection()
@@ -451,13 +459,15 @@ class MainWindow(wx.Frame):
         ISIErrorText2 = "- ISI must be greater than 0\n"
         logErrorText = "- Logfile output directory does not exist\n"
         buttonErrorText = " - Buttons must be separated by comma, with only 2 buttons\n"
+        pauseButtonErrorText = " - Pause button must be 1 key"
     
         #Add errors to error message if they occur
         if "," not in inputButtons or len(inputButtons.split(",")) != 2:
             errorMsgs += buttonErrorText
         else:
             inputButtons = [str(inputButton.strip().lower()) for inputButton in inputButtons.split(",")]
-            
+        if len(pauseButton) != 1:
+            errorMsgs += pauseButtonErrorText
         if (subjectID.isdigit() == False):
             errorMsgs += idErrorText
         if not subset.isdigit():
@@ -485,7 +495,9 @@ class MainWindow(wx.Frame):
         else:
             expMDT = mdtsuite.MDTSuite(expType, subjectID, int(subset),
                         float(trialDur), float(ISI), int(expLenVar), 
-                        selfPaced, currentDir, logDir, expVariant, screenType, practiceTrials, buttonDiagnostic, inputButtons)
+                        selfPaced, currentDir, logDir, expVariant, 
+                        screenType, practiceTrials, buttonDiagnostic, 
+                        inputButtons, pauseButton)
             expMDT.RunSuite()
 
 

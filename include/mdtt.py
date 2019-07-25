@@ -26,7 +26,7 @@ import numpy as np
 class MDTT(object):
 
     def __init__(self, logfile, imgDir, subjectNum, screenType, numStim, 
-                 numBlocks, trialDuration, ISI, selfPaced, runPractice, inputButtons):
+                 numBlocks, trialDuration, ISI, selfPaced, runPractice, inputButtons, pauseButton):
 
         self.logfile = logfile
         self.imgDir = imgDir
@@ -41,6 +41,7 @@ class MDTT(object):
         self.runPractice = runPractice
         self.leftButton  = inputButtons[0]
         self.rightButton = inputButtons[1]
+        self.pauseButton = pauseButton
 
         #Set up window, center, left and right image sizes + positions
 
@@ -190,9 +191,9 @@ class MDTT(object):
         keyPresses = []
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keyPresses = getKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
+            keyPresses = getKeys(keyList=[self.leftButton,self.rightButton,self.pauseButton,"escape"],timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keyPresses = waitKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
+            keyPresses = waitKeys(keyList=[self.leftButton,self.rightButton,self.pauseButton,"escape"],timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
         return keyPresses
@@ -215,9 +216,9 @@ class MDTT(object):
         self.clock.reset()
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keyPresses = getKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
+            keyPresses = getKeys(keyList=[self.leftButton,self.rightButton,self.pauseButton,"escape"],timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keyPresses = waitKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
+            keyPresses = waitKeys(keyList=[self.leftButton,self.rightButton,self.pauseButton,"escape"],timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
         return keyPresses
@@ -234,7 +235,7 @@ class MDTT(object):
         studyText = TextStim(self.window,studyPrompt,color='Black')
         studyText.draw(self.window)
         self.window.flip()
-        continueKey = waitKeys(keyList=['space','escape'])
+        continueKey = waitKeys(keyList=[self.pauseButton,'escape'])
 
         if (continueKey[0] == 'escape'):
             self.logfile.write("\n\n\nStudy Not Run Early\n\n\n")
@@ -256,7 +257,9 @@ class MDTT(object):
             if (respKey == "escape"):
                 self.logfile.write("\n\n\nStudy block terminated early\n\n\n")
                 break
-
+            elif (respKey == self.pauseButton):
+                self.Pause()
+                
             self.logfile.write("{:^5}{:<23}{:^11}{:<1.3f}\n".format(
                 i+1,imageBlock[i],respKey,respRT))
 
@@ -275,7 +278,7 @@ class MDTT(object):
         testText = TextStim(self.window,testPrompt,color='Black')
         testText.draw(self.window)
         self.window.flip()
-        continueKey = waitKeys(keyList=['space','escape'])
+        continueKey = waitKeys(keyList=[self.pauseButton,'escape'])
 
         if (continueKey[0] == 'escape'):
             self.logfile.write("\n\n\nTest Not Run\n\n\n")
@@ -329,7 +332,10 @@ class MDTT(object):
             #Break out of image block with escape, break out of program with f5
             if (respKey == 'escape'):
                 self.logfile.write("\n\nTest block terminated early\n\n")
-                break            
+                break     
+            elif (respKey == self.pauseButton):
+                self.Pause()
+                
             #Keep track of score
             if (respKey):
                 self.scoreList[pairList[i][2]-1][2] += 1
@@ -345,6 +351,17 @@ class MDTT(object):
             self.logfile.write(lgform)
 
         return 1
+
+    def Pause(self):
+        """Pauses the task, and displays a message waiting for a spacebar
+        input from the user before continuing to proceed.
+        """
+        pauseMsg = "Experiment Paused\n\nPress '{}' to continue".format(self.pauseButton)
+        pauseText = TextStim(self.window, text=pauseMsg, color='Black', height=40)
+        pauseText.draw(self.window)
+        self.window.flip()
+        waitKeys(keyList=[self.pauseButton])
+        clearEvents()
 
     def SegmentPracticeImages(self, images):
         '''
@@ -376,6 +393,7 @@ class MDTT(object):
         Show the prompt on the screen and wait for space, or the keylist specified
         returns the key pressed
         '''
+        keylist = [self.pauseButton, 'escape']
         text = TextStim(self.window,prompt,color='Black')
         text.draw(self.window)
         self.window.flip()
@@ -418,13 +436,15 @@ class MDTT(object):
             if (respKey == "escape"):
                 self.logfile.write("\n\n\nStudy block terminated early\n\n\n")
                 break
-
+            elif (respKey == self.pauseButton):
+                self.Pause()
+                
             self.logfile.write("{:^5}{:<23}{:^11}{:<1.3f}\n".format(
                 i+1,imgs[i],respKey,respRT))
                 
                 
         ### Test
-        self.ShowPromptAndWaitForSpace(" Which came first? Left or right? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Which came first? Left or right? ('{}' to continue)".format(self.pauseButton))
         
         self.logfile.write("\nBegin Practice Test {}\n".format(practiceBlock))
         self.logfile.write("{a:<7}{b:<7}{c:<23}{d:<23}{e:<7}{f:<7}{g:<10}{h:<7}{i}\n".format(
@@ -493,7 +513,7 @@ class MDTT(object):
             results = self.RunSinglePractice(i+1, [img for img in practiceImages[i]])
             
             # If they get a certain percentage correct, then stop the practice
-            self.ShowPromptAndWaitForSpace("You got {}% correct! (space to continue)".format(int(results*100)))
+            self.ShowPromptAndWaitForSpace("You got {}% correct! ('{}' to continue)".format(int(results*100), self.pauseButton))
             if results > .6:
                 return
 

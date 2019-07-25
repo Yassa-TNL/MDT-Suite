@@ -25,7 +25,7 @@ class MDTSuite(object):
 
     def __init__(self, expType, subID, subset, trialDur, ISI, expLenVar, 
                  selfPaced, curDir, logDir, expVariant='Normal',
-                 screenType='Fullscreen', practiceTrials=True, buttonDiagnostic=True, inputButtons=['v','n']):
+                 screenType='Fullscreen', practiceTrials=True, buttonDiagnostic=True, inputButtons=['z','m'], pauseButton='p'):
 
         self.expType = expType
         self.expTypeNum = 0
@@ -41,6 +41,7 @@ class MDTSuite(object):
         self.practiceTrials = practiceTrials
         self.buttonDiagnostic = buttonDiagnostic
         self.inputButtons = inputButtons
+        self.pauseButton = pauseButton
 
 
         randomSeed = self.PairRandom(subID, subset)
@@ -250,14 +251,14 @@ class MDTSuite(object):
         if (self.expType == "Object"):
             expMDTO = mdto.MDTO(logfile, self.MDTO_IMG_DIR, self.screenType,
                                 self.expVariant, self.trialDur, self.ISI, 
-                                self.expLenVar, self.selfPaced, self.practiceTrials, self.inputButtons)
+                                self.expLenVar, self.selfPaced, self.practiceTrials, self.inputButtons, self.pauseButton)
             (log, scores) = expMDTO.RunExp()
 
         #Run Spatial Task   
         elif(self.expType == "Spatial"):
             expMDTS = mdts.MDTS(logfile, self.MDTS_IMG_DIR, self.screenType,
                                 self.trialDur, self.ISI, self.expLenVar, 
-                                self.selfPaced, self.practiceTrials, self.inputButtons)
+                                self.selfPaced, self.practiceTrials, self.inputButtons, self.pauseButton)
             #expMDTS.ImageDiagnostic()
             (log, scores) = expMDTS.RunExp()
             
@@ -265,7 +266,7 @@ class MDTSuite(object):
         elif(self.expType == "Temporal"):
             expMDTT = mdtt.MDTT(logfile, self.MDTT_IMG_DIR, self.subID,
                 self.screenType, self.MDTT_NUM_STIM, self.expLenVar, 
-                self.trialDur, self.ISI, self.selfPaced, self.practiceTrials, self.inputButtons)
+                self.trialDur, self.ISI, self.selfPaced, self.practiceTrials, self.inputButtons, self.pauseButton)
             (log, scores) = expMDTT.RunExp()
 
         

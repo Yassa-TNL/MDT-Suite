@@ -34,7 +34,7 @@ import glob
 class MDTO(object):
 
     def __init__(self, logfile, imgDir, screenType, expVariant,
-                trialDuration, ISI, trialsPer, selfPaced, practiceTrials, inputButtons):
+                trialDuration, ISI, trialsPer, selfPaced, practiceTrials, inputButtons, pauseButton):
 
         self.logfile = logfile
         self.expVariant = expVariant
@@ -49,6 +49,7 @@ class MDTO(object):
         self.runPracticeTrials = practiceTrials
         self.leftButton  = inputButtons[0]
         self.rightButton = inputButtons[1]
+        self.pauseButton = pauseButton
 
         if (screenType == 'Windowed'):
             screenSelect = False
@@ -183,11 +184,11 @@ class MDTO(object):
         """Pauses the task, and displays a message waiting for a spacebar
         input from the user before continuing to proceed.
         """
-        pauseMsg = "Experiment Paused\n\nPress space to continue"
+        pauseMsg = "Experiment Paused\n\nPress '{}' to continue".format(self.pauseButton)
         pauseText = TextStim(self.window, text=pauseMsg, color='Black', height=40)
         pauseText.draw(self.window)
         self.window.flip()
-        waitKeys(keyList=['space'])
+        waitKeys(keyList=[self.pauseButton])
         clearEvents()
 
 
@@ -289,10 +290,10 @@ class MDTO(object):
         keyPresses = []
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keyPresses = getKeys(keyList=[self.leftButton, self.rightButton,'space','escape'],
+            keyPresses = getKeys(keyList=[self.leftButton, self.rightButton,self.pauseButton,'escape'],
                                  timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keyPresses = waitKeys(keyList=[self.leftButton, self.rightButton,'space','escape'],
+            keyPresses = waitKeys(keyList=[self.leftButton, self.rightButton,self.pauseButton,'escape'],
                                 timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
@@ -322,7 +323,7 @@ class MDTO(object):
             studyText = TextStim(self.window,studyPromptE,color='Black')
         studyText.draw(self.window)
         self.window.flip()
-        continueKey = waitKeys(keyList=['space','escape'])
+        continueKey = waitKeys(keyList=[self.pauseButton,'escape'])
         if (continueKey[0] == 'escape'):
             self.logfile.write("\n\n\nStudy Not Run\n\n")
             return 0
@@ -352,7 +353,7 @@ class MDTO(object):
             if (response == "escape"):
                 self.logfile.write("\n\nStudy terminated early\n\n")
                 return 0
-            elif (response == "space"):
+            elif (response == self.pauseButton):
                 self.Pause()
 
             trialFormat = '{:<7}{:<17s}{:<10s}{:<6s}{:<4.3f}\n'.format(
@@ -388,7 +389,7 @@ class MDTO(object):
         
         testText.draw(self.window)
         self.window.flip()
-        continueKey = waitKeys(keyList=['space','escape'])
+        continueKey = waitKeys(keyList=[self.pauseButton,'escape'])
         if (continueKey[0] == 'escape'):
             self.logfile.write("\n\n\nTest Not Run\n\n")
             return 0
@@ -422,7 +423,7 @@ class MDTO(object):
             if (response == "escape"):
                 self.logfile.write("\n\nTest terminated early\n\n")
                 break
-            elif (response == "space"):
+            elif (response == self.pauseButton):
                 self.Pause()
 
             trialFormat = '{:<7}{:<15}{:<11}{:<9}{:<6}{:<4.3f}\n'.format(
@@ -459,11 +460,12 @@ class MDTO(object):
         return 1
     
 
-    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space', 'escape']):
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['p', 'escape']):
         '''
         Show the prompt on the screen and wait for space, or the keylist specified
         returns the key pressed
         '''
+        keylist = [self.pauseButton, 'escape']
         text = TextStim(self.window,prompt,color='Black')
         text.draw(self.window)
         self.window.flip()
@@ -496,7 +498,7 @@ class MDTO(object):
             imgPairs.append([images[i],images[i+1], t])
 
         ### Encoding
-        self.ShowPromptAndWaitForSpace(" Outdoor or Indoor? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Outdoor or Indoor? ('{}' to continue)".format(self.pauseButton))
         random.shuffle(imgPairs)
         
         self.logfile.write("\nBegin Practice Encoding {}\n\n".format(practiceBlock))
@@ -514,7 +516,7 @@ class MDTO(object):
                     self.logfile.write("\n\nPractice block terminated early\n\n")
                     self.logfile.close()
                     sys.exit()
-                elif (response == "space"):
+                elif (response == self.pauseButton):
                     self.Pause()
 
                 trialFormat = '{:<7}{:<17}{:<11}{:<9}{:<6}{:<4.3f}\n'.format(
@@ -523,7 +525,7 @@ class MDTO(object):
 
 
         ### Test
-        self.ShowPromptAndWaitForSpace(" Old or new? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Old or new? ('{}' to continue)".format(self.pauseButton))
         random.shuffle(imgPairs)
 
         self.logfile.write("\nBegin Practice Test {}\n\n".format(practiceBlock))
@@ -544,7 +546,7 @@ class MDTO(object):
             if (response == "escape"):
                 self.logfile.write("\n\nPractice terminated early\n\n")
                 return -1
-            elif (response == "space"):
+            elif (response == self.pauseButton):
                 self.Pause()
 
             trialFormat = '{:<7}{:<17}{:<11}{:<9}{:<6}{:<4.3f}\n'.format(
@@ -573,7 +575,7 @@ class MDTO(object):
             results = self.RunSinglePractice(i+1, imagesThisPracticeSession)
             
             # If they get a certain percentage correct, then stop the practice
-            self.ShowPromptAndWaitForSpace("You got {}% correct! (space to continue)".format(int(results*100)))
+            self.ShowPromptAndWaitForSpace("You got {}% correct! ('{}' to continue)".format(int(results*100), self.pauseButton))
             if results > .6:
                 return
 
@@ -600,7 +602,7 @@ class MDTO(object):
             self.window.close()
 
         # Show main welcome window
-        welcomePrompt = "Thank you for participating in our study! Press space to begin"
+        welcomePrompt = "Thank you for participating in our study! Press '{}' to begin".format(self.pauseButton)
         self.ShowPromptAndWaitForSpace(welcomePrompt)
         
         # If run practice trials, then RunPractice

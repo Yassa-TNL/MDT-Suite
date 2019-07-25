@@ -24,7 +24,7 @@ import numpy as np
 class MDTS(object):
 
     def __init__(self, logfile, imgDir, screenType, 
-                 trialDuration, ISI, trialsPer, selfPaced, practiceTrials, inputButtons):
+                 trialDuration, ISI, trialsPer, selfPaced, practiceTrials, inputButtons, pauseButton):
 
         self.logfile = logfile
         self.trialDuration = trialDuration
@@ -37,6 +37,7 @@ class MDTS(object):
         self.runPracticeTrials = practiceTrials
         self.leftButton  = inputButtons[0]
         self.rightButton = inputButtons[1]
+        self.pauseButton = pauseButton
 
 
         if (screenType == 'Windowed'):
@@ -56,7 +57,17 @@ class MDTS(object):
         for i in range(0,4):
             self.scoreList.append([0,0,0])
 
-
+    def Pause(self):
+        """Pauses the task, and displays a message waiting for a spacebar
+        input from the user before continuing to proceed.
+        """
+        pauseMsg = "Experiment Paused\n\nPress '{}' to continue".format(self.pauseButton)
+        pauseText = TextStim(self.window, text=pauseMsg, color='Black', height=40)
+        pauseText.draw(self.window)
+        self.window.flip()
+        waitKeys(keyList=[self.pauseButton])
+        clearEvents()
+        
     def CreatePosPair(self, moveType):
         """Generates two (x,y) coordinates to be associated with a particular
         image - the first being the study phase position, and second being the
@@ -263,20 +274,21 @@ class MDTS(object):
         keypresses = []
         if (self.selfPaced == False):
             wait(self.trialDuration,self.trialDuration)
-            keypresses = getKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
+            keypresses = getKeys(keyList=[self.leftButton,self.rightButton,self.pauseButton,"escape"],timeStamped=self.clock)
         elif (self.selfPaced == True):
-            keypresses = waitKeys(keyList=[self.leftButton,self.rightButton,"escape"],timeStamped=self.clock)
+            keypresses = waitKeys(keyList=[self.leftButton,self.rightButton,self.pauseButton,"escape"],timeStamped=self.clock)
         self.window.flip()
         wait(self.ISI)
         if len(keypresses) <1:
             return '',0
         return keypresses[0][0],keypresses[0][1]
 
-    def ShowPromptAndWaitForSpace(self, prompt, keylist=['space', 'escape']):
+    def ShowPromptAndWaitForSpace(self, prompt, keylist=['p', 'escape']):
         '''
         Show the prompt on the screen and wait for space, or the keylist specified
         returns the key pressed
         '''
+        keylist = [self.pauseButton, 'escape']
         text = TextStim(self.window,prompt,color='Black')
         text.draw(self.window)
         self.window.flip()
@@ -317,7 +329,7 @@ class MDTS(object):
         log.write("{a:<22}{b:<12}{c:<14}{d:<11}{e:<9}{f:<8}{g}\n".format(
             a='Image',b='Type',c='Start',d='End',e='Correct',f='Resp',g='RT'))
 
-        continueKey = waitKeys(keyList=['space','escape'])
+        continueKey = waitKeys(keyList=[self.pauseButton,'escape'])
         if (continueKey[0] == 'escape'):
             self.logfile.write("\n\n\nPhase Not Run\n\n\n")
             return 0
@@ -360,7 +372,9 @@ class MDTS(object):
             if (response == "escape"):
                 self.logfile.write("\n\nPhase terminated early\n\n")
                 break
-
+            elif (response == self.pauseButton):
+                self.Pause()
+                
             #Write formatted info about trial to logfile
             log.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
                 imgs[imgIdx][0],trialType,imgs[imgIdx][1],imgs[imgIdx][2],
@@ -429,7 +443,7 @@ class MDTS(object):
         # imgs = [[img, trialType, Study(x,y), Test(x,y)]]
         imgs = self.SegmentPracticeImages(images)
         
-        self.ShowPromptAndWaitForSpace(" Outdoor or Indoor? (space to continue)")
+        self.ShowPromptAndWaitForSpace(" Outdoor or Indoor? ('{}' to continue)".format(self.pauseButton))
         random.shuffle(imgs)
         
         self.logfile.write("\nBegin Practice Encoding {}\n\n".format(practiceBlock))
@@ -445,7 +459,7 @@ class MDTS(object):
                 self.logfile.write("\n\n Practice terminated early\n\n")
                 self.logfile.close()
                 sys.exit()
-            elif (response == "space"):
+            elif (response == self.pauseButton):
                 self.Pause()
 
             trialTypeMap = {0: 'Same', 1: 'Small', 2: 'Large', 3: 'Crnr'}
@@ -457,7 +471,7 @@ class MDTS(object):
                 img,trialTypeStr,studyCoord,testCoord,correct,response, RT))
         
         ### Test
-        self.ShowPromptAndWaitForSpace("Is the object location same or new? (space to continue)")
+        self.ShowPromptAndWaitForSpace("Is the object location same or new? ('{}' to continue)".format(self.pauseButton))
         random.shuffle(imgs)
 
         self.logfile.write("\nBegin Practice Test {}\n\n".format(practiceBlock))
@@ -474,7 +488,7 @@ class MDTS(object):
                 self.logfile.write("\n\n Practice terminated early\n\n")
                 self.logfile.close()
                 sys.exit()
-            elif (response == "space"):
+            elif (response == self.pauseButton):
                 self.Pause()
 
             trialTypeMap = {0: 'Same', 1: 'Small', 2: 'Large', 3: 'Crnr'}
@@ -510,7 +524,7 @@ class MDTS(object):
             results = self.RunSinglePractice(i+1, [img for img in practiceImages[i]])
             
             # If they get a certain percentage correct, then stop the practice
-            self.ShowPromptAndWaitForSpace("You got {}% correct! (space to continue)".format(int(results*100)))
+            self.ShowPromptAndWaitForSpace("You got {}% correct! ('{}' to continue)".format(int(results*100), self.pauseButton))
             if results > .6:
                 return
 
@@ -535,7 +549,7 @@ class MDTS(object):
             self.window.close()
 
         # Show main welcome window
-        welcomePrompt = "Thank you for participating in our study! Press space to begin"
+        welcomePrompt = "Thank you for participating in our study! Press '{}' to begin".format(self.pauseButton)
         self.ShowPromptAndWaitForSpace(welcomePrompt)
         
         # If run practice trials, then RunPractice
