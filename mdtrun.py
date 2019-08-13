@@ -162,7 +162,7 @@ class MainWindow(wx.Frame):
         self.inputISIText = wx.StaticText(self.panel, wx.ID_ANY, 'ISI')
         self.inputISIEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '0.5')
         self.inputButtonsText = wx.StaticText(self.panel, wx.ID_ANY, 'Input Buttons (separate with comma)')
-        self.inputButtonsEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'z,m')
+        self.inputButtonsEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'f,j')
         self.pauseButtonText = wx.StaticText(self.panel, wx.ID_ANY, 'Pause button')
         self.pauseButtonEntry = wx.TextCtrl(self.panel, wx.ID_ANY, 'p')
         self.trialText = wx.StaticText(self.panel, wx.ID_ANY, 'Trials/Condition')
