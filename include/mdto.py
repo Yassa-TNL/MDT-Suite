@@ -561,7 +561,6 @@ class MDTO(object):
         Runs three rounds of practice trials. 
         If the participant gets a certain amount correct, they move on to the real test.
         '''
-
         
         dirFiles = os.listdir(self.imgDir)
         practiceImages = [img for img in dirFiles if "PR" in img]

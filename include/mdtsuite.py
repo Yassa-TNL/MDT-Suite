@@ -29,6 +29,7 @@ class MDTSuite(object):
 
         self.expType = expType
         self.expTypeNum = 0
+        self.subset = subset
         self.screenType = screenType
         self.expVariant = expVariant
         self.subID = subID
@@ -54,9 +55,9 @@ class MDTSuite(object):
         self.MDTS_IMG_LOC = "mdts_images"
         self.MDTT_IMG_LOC = "mdtt_images"
         self.IMAGE_DIR = os.path.join(self.curDir, self.IMAGE_LOC)
-        self.MDTO_IMG_DIR = os.path.join(self.IMAGE_DIR, self.MDTO_IMG_LOC)
-        self.MDTS_IMG_DIR = os.path.join(self.IMAGE_DIR, self.MDTS_IMG_LOC)
-        self.MDTT_IMG_DIR = os.path.join(self.IMAGE_DIR, self.MDTT_IMG_LOC)
+        self.MDTO_IMG_DIR = os.path.join(self.IMAGE_DIR, self.MDTO_IMG_LOC, "Set_{}".format(subset))
+        self.MDTS_IMG_DIR = os.path.join(self.IMAGE_DIR, self.MDTS_IMG_LOC, "Set_{}".format(subset))
+        self.MDTT_IMG_DIR = os.path.join(self.IMAGE_DIR, self.MDTT_IMG_LOC, "Set_{}".format(subset))
         self.MDTT_NUM_STIM  = 32
 
     def MakeLog(self):
@@ -68,6 +69,7 @@ class MDTSuite(object):
         return: initialized log file, open for writing
         """
         sub = int(self.subID)
+        subset = self.subset
         
         if (self.expType == "Object"):
             eType = "MDTO"
@@ -95,6 +97,7 @@ class MDTSuite(object):
         log.write("MDT-%s Task: %s" %(self.expType, logTime))
         log.write("\nVersion: {}".format(self._version))
         log.write("\nSubject ID: %d" %(sub))
+        log.write("\nStimulus Set: %d" %(subset))
         if self.selfPaced:
             log.write("\nTrial Duration: Self paced by subject")
         else:
