@@ -19,7 +19,6 @@ Versions:
 * Temporal
 
 Supports:
-* fMRI
 * EEG
 * Behavioral 
 
