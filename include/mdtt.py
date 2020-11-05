@@ -231,7 +231,7 @@ class MDTT(object):
         imageBlock: List of images to display during the study
         session: the number of the session (block number) that is running
         """
-        studyPrompt = ("Test Session {}/{}: Are the following objects indoor or outdoor?".format(session, 10))
+        studyPrompt = ("Test Session {}/{}: Are the following objects indoor or outdoor?\n\n('{}' to continue)".format(session, 10, self.pauseButton))
         studyText = TextStim(self.window,studyPrompt,color='Black')
         studyText.draw(self.window)
         self.window.flip()
@@ -274,7 +274,7 @@ class MDTT(object):
         pairList: List of paired image indexes w/ trial type
         session: the number of the session (block number) that is running
         """
-        testPrompt = ("In this phase, the same series of objects will be shown\n\nWhich came first: Left or Right? ")
+        testPrompt = ("In this phase, the same series of objects will be shown\n\nWhich came first: Left or Right?\n\n('{}' to continue)".format(self.pauseButton))
         testText = TextStim(self.window,testPrompt,color='Black')
         testText.draw(self.window)
         self.window.flip()
@@ -418,7 +418,7 @@ class MDTT(object):
         # imgs = [[img, trialType, Study(x,y), Test(x,y)]]
         testIdxs = self.SegmentPracticeImages(imgs)
         
-        self.ShowPromptAndWaitForSpace(" Indoor or Outdoor?")
+        self.ShowPromptAndWaitForSpace(" Indoor or Outdoor?\n\n('{}' to continue)".format(self.pauseButton))
         
         self.logfile.write("\nBegin Practice Study {}\n".format(practiceBlock))
         self.logfile.write("{h1:<6}{h2:<23}{h3:<10}{h4}\n".format(
@@ -507,7 +507,7 @@ class MDTT(object):
 
         # Run each practice session
         for i in range(3):
-            practicePrompt = "Let's practice"
+            practicePrompt = "Let's practice\n\n('{}' to continue)".format(self.pauseButton)
             self.ShowPromptAndWaitForSpace(practicePrompt)
             
             results = self.RunSinglePractice(i+1, [img for img in practiceImages[i]])

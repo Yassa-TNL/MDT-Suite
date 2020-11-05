@@ -311,8 +311,8 @@ class MDTS(object):
                 1 -> task ran to completion 
         """
 
-        studyPrompt = ("Let's do the real test. \n\n Are the following objects indoor or outdoor?")
-        testPrompt = ("In this phase, you will see the same series of objects one at a time.\n\nAre the object locations same or new?")
+        studyPrompt = ("Let's do the real test. \n\n Are the following objects indoor or outdoor?\n\n('{}' to continue)".format(self.pauseButton))
+        testPrompt = ("In this phase, you will see the same series of objects one at a time.\n\nAre the object locations same or new? \n\n('{}' to continue)".format(self.pauseButton))
         studyText = TextStim(self.window,studyPrompt,color='Black')
         testText = TextStim(self.window,testPrompt,color='Black')
 
@@ -518,7 +518,7 @@ class MDTS(object):
 
         # Run each practice session
         for i in range(3):
-            practicePrompt = "Let's practice"
+            practicePrompt = "Let's practice.\n\n('{}' to continue)".format(self.pauseButton)
             self.ShowPromptAndWaitForSpace(practicePrompt)
             
             results = self.RunSinglePractice(i+1, [img for img in practiceImages[i]])

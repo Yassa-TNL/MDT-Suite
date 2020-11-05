@@ -309,7 +309,7 @@ class MDTO(object):
         wrong" answers are graded.
         """
         ecog = False if self.expVariant != "ECog" else True
-        studyPromptN = ("Let's do the real test. \n\n Are the following objects indoor or outdoor?"
+        studyPromptN = ("Let's do the real test. \n\n Are the following objects indoor or outdoor? \n\n Press 'p' to continue"
                        )
         '''
         studyPromptE = ("In the following phase, a sequence of images will be "
@@ -374,7 +374,7 @@ class MDTO(object):
         """
         ecog = False if self.expVariant != "ECog" else True
         testPromptN = ("In this phase, another sequence of images will be shown"
-                      "\n\nAre the objects old or new?"
+                      "\n\nAre the objects old or new?\n\n Press 'p' to continue."
                       )
         '''testPromptE = ("In this phase, another sequence of images will be shown."
                       "\n\n-Press '1' if the image presented was also shown "
@@ -567,7 +567,7 @@ class MDTO(object):
         
         # Run each practice session
         for i in range(3):
-            practicePrompt = "Let's practice"
+            practicePrompt = "Let's practice. ('{}' to continue)".format(self.pauseButton)
             self.ShowPromptAndWaitForSpace(practicePrompt)
             
             imagesThisPracticeSession = sorted([img for img in practiceImages if "Set_{}".format(i+1) in img])
