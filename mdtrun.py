@@ -3,7 +3,7 @@
 #TODO   Implement ECog functionality for all 3 tasks
 #       Implement Scanner functionality for all 3 tasks    
 
-VERSION=1.21
+VERSION=2.0
 
 """Creates the GUI for the MDT Suite. MDT, or Mnemonic Discrimination 
 Task, is a type of experimental task that tests various aspects of a
@@ -230,36 +230,36 @@ class MainWindow(wx.Frame):
         inputIDSizer.Add(self.inputIDText, 0, lft, 5)
         inputIDSizer.AddStretchSpacer(1)
         inputIDSizer.Add(self.inputIDEntry, 0, lft,  5)
-        inputIDSizer.AddSpacer((90,0))
+        inputIDSizer.AddSpacer(90)
         inputSetSizer.Add(self.inputSetText, 0, lft, 5)
         inputSetSizer.AddStretchSpacer(1)
         inputSetSizer.Add(self.inputSetEntry, 0, lft, 5)
-        inputSetSizer.AddSpacer((90,0))
+        inputSetSizer.AddSpacer(90)
         inputDurSizer.Add(self.inputDurText, 0, lft, 5)
         inputDurSizer.AddStretchSpacer(1)
         inputDurSizer.Add(self.inputDurEntry, 0, lft, 5)
-        inputDurSizer.AddSpacer((90,0))
+        inputDurSizer.AddSpacer(90)
         inputISISizer.Add(self.inputISIText, 0, lft, 5)
         inputISISizer.AddStretchSpacer(1)
         inputISISizer.Add(self.inputISIEntry, 0, lft, 5)
-        inputISISizer.AddSpacer((90,0))
+        inputISISizer.AddSpacer(90)
         pauseButtonSizer.Add(self.pauseButtonText, 0, lft, 5)
         pauseButtonSizer.AddStretchSpacer(1)
         pauseButtonSizer.Add(self.pauseButtonEntry, 0, lft, 5)
-        pauseButtonSizer.AddSpacer((90,0))
+        pauseButtonSizer.AddSpacer(90)
         inputButtonsSizer.Add(self.inputButtonsText, 0, lft, 5)
         inputButtonsSizer.AddStretchSpacer(1)
         inputButtonsSizer.Add(self.inputButtonsEntry, 0, lft, 5)
-        inputButtonsSizer.AddSpacer((90,0))
+        inputButtonsSizer.AddSpacer(90)
         
         trialSizer.Add(self.trialText, 0, lft, 5)
         trialSizer.AddStretchSpacer(1)
         trialSizer.Add(self.trialRB, 0, lft, 5)
-        trialSizer.AddSpacer((90,0))
+        trialSizer.AddSpacer(90)
         blockSizer.Add(self.blockText, 0, lft, 5)
         blockSizer.AddStretchSpacer(1)
         blockSizer.Add(self.blockRB, 0, lft, 5)
-        blockSizer.AddSpacer((90,0))
+        blockSizer.AddSpacer(90)
         checkSizer.Add(self.chkSelfPaced, 0, lft, 5)
         checkSizer.AddStretchSpacer(1)
         practiceTrialSizer.Add(self.chkPracticeTrials, 0, lft, 5)

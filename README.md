@@ -2,7 +2,7 @@
 Mnemonic Discrimination Task written for PsychoPy
 
 Supported PsychoPy Versions:<br/>
-1.85.3
+v2023.1.3
 
 Written by: Derek Delisle<br/>
 Maintained by: John Janecek

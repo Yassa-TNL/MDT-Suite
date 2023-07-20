@@ -120,9 +120,9 @@ class MDTT(object):
         return: list containing elements each with: (index1,index2,trialType)
         """
 
-        startList = range(0,self.trialsPer)
-        endList = range(self.numStim - self.trialsPer,self.numStim)
-        trialOrder = range(0,(self.trialsPer * 3)) #3 categories besides P/R
+        startList = list(range(0,self.trialsPer))
+        endList = list(range(self.numStim - self.trialsPer,self.numStim))
+        trialOrder = list(range(0,(self.trialsPer * 3))) #3 categories besides P/R
         random.shuffle(startList)
         random.shuffle(endList)
 
@@ -131,7 +131,7 @@ class MDTT(object):
         def AttemptSplit():
 
             # 3 categories besides P/R
-            trialOrder = range(0,(self.trialsPer * 3)) 
+            trialOrder = list(range(0,(self.trialsPer * 3)))
             random.shuffle(trialOrder)
             self.usedList = []    
             attemptList = []
@@ -291,7 +291,7 @@ class MDTT(object):
         self.logfile.write(lghead)
 
         #Randomize if pair is shown: (bef > aft) or (aft > bef) order
-        sideOrder = range(0,len(pairList))
+        sideOrder = list(range(0,len(pairList)))
         random.shuffle(sideOrder)
         correct = ''
         keyPresses = []
@@ -371,7 +371,7 @@ class MDTT(object):
         # Since we know that the images are already randomized, we can just iterate over them
         # In order for the code to work, we want 4 practice images per practice block
         if len(images) != 4:
-            print "Assertion error: length of practice images is not equal to 4"
+            print("Assertion error: length of practice images is not equal to 4")
             self.window.close()
             sys.exit()
         
@@ -496,7 +496,7 @@ class MDTT(object):
         dirFiles = os.listdir(self.imgDir)
         practiceImages = [img for img in dirFiles if "PR_" in img]
         if len(practiceImages) == 0:
-            print "No practice images found"
+            print("No practice images found")
             self.window.close()
             sys.exit()
             
@@ -554,7 +554,7 @@ class MDTT(object):
             imageBlockList.append(block)
 
         #Run through each study/test block
-        blockOrder = range(0, self.numBlocks)
+        blockOrder = list(range(0, self.numBlocks))
         random.shuffle(blockOrder)
         writeScores = True
         for i in range(0,len(blockOrder)):

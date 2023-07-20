@@ -179,7 +179,7 @@ class MDTS(object):
         #Nested function - populates each division of the image list
         def SegmentFill(imageList, addingList, moveType):
 
-            order = range(0,self.trialsPer)
+            order = list(range(0,self.trialsPer))
             random.shuffle(order)
             for i in order:
                 pospair = self.CreatePosPair(moveType)
@@ -326,16 +326,16 @@ class MDTS(object):
             self.logfile.write("\nBegin Test\n")
 
         log = self.logfile
-        log.write("{a:<22}{b:<12}{c:<14}{d:<11}{e:<9}{f:<8}{g}\n".format(
+        log.write("{a} | {b} | {c} | {d} | {e} | {f} |{g}\n".format(
             a='Image',b='Type',c='Start',d='End',e='Correct',f='Resp',g='RT'))
-
+            
         continueKey = waitKeys(keyList=[self.pauseButton,'escape'])
         if (continueKey[0] == 'escape'):
             self.logfile.write("\n\n\nPhase Not Run\n\n\n")
             return 0
             
         imgs = self.imageList
-        trialOrder = range(0,len(imgs))
+        trialOrder = list(range(0,len(imgs)))
         random.shuffle(trialOrder)
 
         #Run through each trial
@@ -376,7 +376,7 @@ class MDTS(object):
                 self.Pause()
                 
             #Write formatted info about trial to logfile
-            log.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
+            log.write("{} | {} | {} | {} | {} | {} |{}\n".format(
                 imgs[imgIdx][0],trialType,imgs[imgIdx][1],imgs[imgIdx][2],
                 correct,response, RT))
           
@@ -447,7 +447,7 @@ class MDTS(object):
         random.shuffle(imgs)
         
         self.logfile.write("\nBegin Practice Encoding {}\n\n".format(practiceBlock))
-        self.logfile.write("{a:<22}{b:<12}{c:<14}{d:<11}{e:<9}{f:<8}{g}\n".format(
+        self.logfile.write("{a} | {b} | {c} | {d} | {e} | {f} |{g}\n".format(
             a='Image',b='Type',c='Start',d='End',e='Correct',f='Resp',g='RT'))
         
         # Run the trial for each encoding trial
@@ -467,7 +467,7 @@ class MDTS(object):
             trialTypeStr = trialTypeMap[trialType]
             correct = ""
                 
-            self.logfile.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
+            self.logfile.write("{} | {} | {} | {} | {} | {} | {}\n".format(
                 img,trialTypeStr,studyCoord,testCoord,correct,response, RT))
         
         ### Test
@@ -475,7 +475,7 @@ class MDTS(object):
         random.shuffle(imgs)
 
         self.logfile.write("\nBegin Practice Test {}\n\n".format(practiceBlock))
-        self.logfile.write("{a:<22}{b:<12}{c:<14}{d:<11}{e:<9}{f:<8}{g}\n".format(
+        self.logfile.write("{a} | {b} | {c} | {d} | {e} | {f} |{g}\n".format(
             a='Image',b='Type',c='Start',d='End',e='Correct',f='Resp',g='RT'))
         
         # Keep track of the total number they got correct
@@ -495,7 +495,7 @@ class MDTS(object):
             trialTypeStr = trialTypeMap[trialType]
             correct = self.leftButton if trialType == 0 else self.rightButton # It should only be correct if its 'Same'
            
-            self.logfile.write("{:<22}{:<9}{:<14}{:<17}{:<7}{:<6}{:>0.3f}\n".format(
+            self.logfile.write("{} | {} | {} | {} | {} | {} | {}\n".format(
                 img,trialTypeStr,studyCoord,testCoord,correct,response, RT))
             if correct == response:
                 totalCorrect += 1
