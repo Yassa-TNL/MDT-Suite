@@ -3,7 +3,7 @@
 #TODO   Implement ECog functionality for all 3 tasks
 #       Implement Scanner functionality for all 3 tasks    
 
-VERSION=2.0
+VERSION=2.1
 
 """Creates the GUI for the MDT Suite. MDT, or Mnemonic Discrimination 
 Task, is a type of experimental task that tests various aspects of a
@@ -149,6 +149,8 @@ class MainWindow(wx.Frame):
 
         self.inputIDText = wx.StaticText(self.panel, wx.ID_ANY, 'Subject ID')
         self.inputIDEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '999' )
+        self.inputSessionIDText = wx.StaticText(self.panel, wx.ID_ANY, 'Session ID')
+        self.inputSessionIDEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '00')
         self.inputSetText = wx.StaticText(self.panel, wx.ID_ANY, 
                                           'Set Choice (1-10)')
         self.inputSetEntry = wx.TextCtrl(self.panel, wx.ID_ANY, '1')
@@ -206,6 +208,7 @@ class MainWindow(wx.Frame):
         expRadioSizer      = wx.BoxSizer(wx.HORIZONTAL)
         choiceRadioSizer   = wx.BoxSizer(wx.HORIZONTAL)
         inputIDSizer       = wx.BoxSizer(wx.HORIZONTAL)
+        inputSessionIDSizer= wx.BoxSizer(wx.HORIZONTAL)
         inputSetSizer      = wx.BoxSizer(wx.HORIZONTAL)
         inputDurSizer      = wx.BoxSizer(wx.HORIZONTAL)
         inputISISizer      = wx.BoxSizer(wx.HORIZONTAL)
@@ -231,6 +234,10 @@ class MainWindow(wx.Frame):
         inputIDSizer.AddStretchSpacer(1)
         inputIDSizer.Add(self.inputIDEntry, 0, lft,  5)
         inputIDSizer.AddSpacer(90)
+        inputSessionIDSizer.Add(self.inputSessionIDText, 0, lft,  5)
+        inputSessionIDSizer.AddStretchSpacer(1)
+        inputSessionIDSizer.Add(self.inputSessionIDEntry, 0, lft, 5)
+        inputSessionIDSizer.AddSpacer(90)
         inputSetSizer.Add(self.inputSetText, 0, lft, 5)
         inputSetSizer.AddStretchSpacer(1)
         inputSetSizer.Add(self.inputSetEntry, 0, lft, 5)
@@ -276,6 +283,7 @@ class MainWindow(wx.Frame):
         #Add rows (sizers) to the main (vertical) sizer
         mainSizer.Add(expRadioSizer, 0, bot | ach, 25)
         mainSizer.Add(inputIDSizer, 0, lft | bot | exp, 5)
+        mainSizer.Add(inputSessionIDSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputSetSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputDurSizer, 0, lft | bot | exp, 5)
         mainSizer.Add(inputISISizer, 0, lft | bot | exp, 5)
@@ -320,6 +328,12 @@ class MainWindow(wx.Frame):
         self.quitButton.Bind(wx.EVT_ENTER_WINDOW, partial(self.OnMouseEnter, 
             txt="Quit Program"))
 
+
+        self.validSession = True
+        self.validID = True
+        self.inputSessionIDEntry.Bind(wx.EVT_TEXT, partial(self.OnSessionIdChange, input="Session"))
+        self.inputIDEntry.Bind(wx.EVT_TEXT, partial(self.OnSessionIdChange, input="ID"))
+
         #Event bindings for mouse leaving area -> clear status bar
         self.inputIDEntry.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
         self.inputDurEntry.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
@@ -335,6 +349,23 @@ class MainWindow(wx.Frame):
         self.panel.SetSizer(mainSizer)
         mainSizer.Fit(self)
         self.Show(True)
+
+    def OnSessionIdChange(self, e, input: str):
+        val = e.GetString()
+        if input == "ID" and (len(val) < 3 or not val.isdigit()):
+            self.validID = False
+            self.runButton.Disable()
+        elif input == "Session" and (len(val) != 2 or not val.isdigit()):                
+            self.validSession = False
+            self.runButton.Disable()
+        else:
+            if input == "ID":
+                self.validID = True
+            else:
+                self.validSession = True
+        
+        if self.validID and self.validSession:
+            self.runButton.Enable()
 
     def OnMouseEnter(self,e,txt):
         """Sets the status bar text when mouse is hovered over a
@@ -436,6 +467,7 @@ class MainWindow(wx.Frame):
         screenType = self.screenRB.GetStringSelection()
         expVariant = self.variantRB.GetStringSelection()
         subjectID = self.inputIDEntry.GetLineText(0)
+        sessionID = self.inputIDEntry.GetLineText(0)
         subset = self.inputSetEntry.GetLineText(0)
         trialDur = self.inputDurEntry.GetLineText(0)
         ISI = self.inputISIEntry.GetLineText(0)
@@ -494,7 +526,7 @@ class MainWindow(wx.Frame):
             errorDlg.Destroy()
         #Run the experiment if no errors in parameter entry    
         else:
-            expMDT = mdtsuite.MDTSuite(expType, subjectID, int(subset),
+            expMDT = mdtsuite.MDTSuite(expType, subjectID, sessionID, int(subset),
                         float(trialDur), float(ISI), int(expLenVar), 
                         selfPaced, currentDir, logDir, expVariant, 
                         screenType, practiceTrials, buttonDiagnostic, 
