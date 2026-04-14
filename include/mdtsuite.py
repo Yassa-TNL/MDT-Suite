@@ -19,7 +19,6 @@ import os,sys,time, random
 import mdto, mdts, mdtt
 from psychopy.visual import Window, TextStim, Circle
 from psychopy.event import clearEvents, getKeys, waitKeys
-from makescreen import MakeScreen
 
 
 class MDTSuite(object):
@@ -175,12 +174,18 @@ class MDTSuite(object):
         Creates a temporary window and accepts keypresses
         Shows the buttonpresses with a highlighting circle
         '''
-        window = MakeScreen(screenType=self.screenType,units='pix',color='White',allowGUI=False)
-        
+        if (self.screenType == 'Windowed'):
+            screenSelect = False
+        elif (self.screenType == 'Fullscreen'):
+            screenSelect = True
+
+        window = Window(fullscr=screenSelect,units='pix', 
+                             color='White',allowGUI=False)
+                            
         indRadius = 100
         tHeight = 2*indRadius/5
-        posC1 = (-0.5, 0)
-        posC2 = (0.5, 0 )
+        posC1 = (-window.size[0]/4, 0)
+        posC2 = (window.size[0]/4, 0 )
         #creating circle opjects
         circ1 = Circle(window, indRadius, lineColor = 'White', lineWidth = 6, pos = posC1) #training and p1 circles
         circ2 = Circle(window, indRadius, lineColor = 'White', lineWidth = 6, pos = posC2)     
@@ -192,7 +197,7 @@ class MDTSuite(object):
         trCircs = [circ1, circ2]
         trTexts = [trtext1, trtext2]
 
-        trTxt = TextStim(window, "This is a test to ensure that the buttons are being recorded correctly.\n Press each button to make sure it is being recorded correctly.\n Press escape to move on", pos = (0,0.4), color = "Black", height = 40, wrapWidth = 0.8)
+        trTxt = TextStim(window, "This is a test to ensure that the buttons are being recorded correctly.\n Press each button to make sure it is being recorded correctly.\n Press escape to move on", pos = (0,window.size[1]/4), color = "Black", height = 40, wrapWidth = 0.8*window.size[0])
                     
         for circ in trCircs:
             circ.fillColor = 'Gray'
