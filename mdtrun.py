@@ -467,7 +467,7 @@ class MainWindow(wx.Frame):
         screenType = self.screenRB.GetStringSelection()
         expVariant = self.variantRB.GetStringSelection()
         subjectID = self.inputIDEntry.GetLineText(0)
-        sessionID = self.inputIDEntry.GetLineText(0)
+        sessionID = self.inputSessionIDEntry.GetLineText(0)
         subset = self.inputSetEntry.GetLineText(0)
         trialDur = self.inputDurEntry.GetLineText(0)
         ISI = self.inputISIEntry.GetLineText(0)
